@@ -252,7 +252,7 @@ class SimpleConsent {
                   <form data-consent-settings>
                     <div data-consent-types class="consent-modal__body">
                     </div>
-                    <div data-consent-actions></div>
+                    <!--div data-consent-actions></div-->
                   </form>
                 </div>
               </div>
@@ -549,8 +549,6 @@ class SimpleConsent {
       this.changeAll();
       this.save(true);
 
-      console.log('Implied consentToAll()');
-
       removeEventListeners();
     }
 
@@ -697,7 +695,7 @@ class SimpleConsent {
       }
 
       if (! this.#config.locale) {
-        console.warn('SimpleConsent: No locale set or detected. Using defaults.');
+        console.info('SimpleConsent: No locale set or detected. Using defaults.');
         return;
       }
 
@@ -706,7 +704,7 @@ class SimpleConsent {
       const l10n = this.#config.l10n[this.#config.locale];
   
       if (! l10n) {
-        console.warn(`SimpleConsent: No localization found for "${this.#config.locale}". Using defaults.`);
+        console.info(`SimpleConsent: No localization found for "${this.#config.locale}". Using defaults.`);
         return;
       }
   
@@ -886,7 +884,7 @@ class SimpleConsent {
     if (typeof this.#config.onUpdateAfter == 'function') 
       this.#config.onUpdateAfter(this.#settings);
 
-    this.#hideAll();
+    setTimeout(() => this.#hideAll(), 200);
 
   }
 
