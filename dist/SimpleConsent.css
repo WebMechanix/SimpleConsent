@@ -274,9 +274,7 @@
 }
 
 .consent-switch input{
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  appearance: none;
   cursor: pointer;
   flex-shrink: 0;
   background-color: var(--consent-color-secondary);

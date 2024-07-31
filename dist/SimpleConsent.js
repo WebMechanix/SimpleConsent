@@ -252,7 +252,7 @@ class SimpleConsent {
                   <form data-consent-settings>
                     <div data-consent-types class="consent-modal__body">
                     </div>
-                    <!--div data-consent-actions></div-->
+                    <div data-consent-actions></div>
                   </form>
                 </div>
               </div>

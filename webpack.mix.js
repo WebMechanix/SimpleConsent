@@ -13,10 +13,8 @@ mix.options({
   },
 });
 
-if (mix.inProduction()) {
-  mix.minify(`src/${library}.js`, `dist/${library}.min.js`)
-    .css(`src/${library}.css`, `dist/${library}.min.css`);
-} else {
-  mix.minify(`src/${library}.js`, `dist/${library}.js`)
-    .css(`src/${library}.css`, `dist/${library}.css`);
-}
+mix.copy(`src/${library}.js`, `dist/${library}.js`)
+  .copy(`src/${library}.css`, `dist/${library}.css`);
+
+mix.minify(`src/${library}.js`, `dist/${library}.min.js`)
+  .css(`src/${library}.css`, `dist/${library}.min.css`);
