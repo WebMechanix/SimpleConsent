@@ -8,7 +8,7 @@
 
   --consent-background-color: #fff;
   --consent-banner-heading-font-size: 1.25rem;
-  --consent-banner-max-width: 26rem; /* ~416px */
+  --consent-banner-max-width: 28rem; /* ~448px */
   --consent-banner-offset: 0.75rem;
 
   --consent-border: 1px solid rgba(0, 0, 0, 0.175);
@@ -28,6 +28,8 @@
 
   --consent-heading-font-family: inherit;
   --consent-heading-font-weight: 700;
+
+  --consent-line-height: 1.35;
 
   --consent-modal-width: 42rem; /* ~672px */
   --consent-modal-heading-font-size: var(--consent-banner-heading-font-size);
@@ -53,6 +55,7 @@
   flex-direction: column;
   gap: var(--consent-flex-col-spacing);
   font-size: var(--consent-font-size);
+  line-height: var(--consent-line-height);
   padding: var(--consent-padding-base);
   border: var(--consent-border);
   border-radius: var(--consent-border-radius);
@@ -252,7 +255,11 @@
   margin-bottom: calc(1.5 * var(--consent-flex-col-spacing));
 }
 
-.consent-modal [data-consent-action="denyAll"]{
+.consent-modal [data-consent-action="denyAll"]:last-child{
+  margin-left: auto;
+}
+
+.consent-modal [data-consent-action="denyAll"]:first-child{
   margin-right: auto;
 }
 
@@ -279,6 +286,7 @@
   transition: color 0.2s ease-in-out, background-position 0.2s ease-in-out;
   height: 1.5rem;
   width: 2.75rem;
+  margin: 0;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
 }
 
@@ -294,6 +302,7 @@
 }
 
 .consent-switch label{
+  display: inline-block;
   line-height: 1.5rem;
   font-size: 1rem;
   font-weight: 700;

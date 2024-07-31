@@ -26,15 +26,17 @@ class SimpleConsent {
 
     actions: {
       banner: {
+        _order: ['showSettings', 'denyAll', 'acceptAll'],
         showSettings: true,
         denyAll: true,
         acceptAll: true,
       },
       modal: {
-        denyAll: true,
-        saveSettings: true,
-        acceptSelected: true,
+        _order: ['denyAll', 'saveSettings', 'acceptSelected', 'acceptAll'],
         acceptAll: true,
+        acceptSelected: true,
+        saveSettings: true,
+        denyAll: true,
       },
     },
 
@@ -302,7 +304,7 @@ class SimpleConsent {
     text: {
       banner: {
         heading: 'Privacy Notice',
-        description: 'This website uses cookies to deliver our services and to analyze traffic. We also share information about your use of our site with advertising and other partners.',
+        description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our traffic. Information is also shared about your use of our site with our advertising partners.',
         actions: {
           acceptAll: 'Accept All',
           denyAll: 'Decline All',
@@ -311,7 +313,7 @@ class SimpleConsent {
       },
       modal: {
         heading: 'Consent & Privacy Settings',
-        description: 'This website uses services that store cookies on your browser to collect information. The information collected might relate to you, your preferences or your device, and is mostly used to make the site work as you expect it to and to provide a more personalized web experience. However, you can choose not to allow certain types of cookies & services (listed below).',
+        description: 'This website uses services that utilize storage features in your browser (via cookies or other browser storage functionality) to collect information. You can choose to grant or deny certain types of data collection using the controls below.',
         toggleAll: 'Enable/Disable All',
         actions: {
           acceptAll: 'Accept All',
@@ -691,7 +693,7 @@ class SimpleConsent {
   
       if (! this.#config.locale) {
         const lang = document.documentElement.lang;
-        this.#config.locale = lang ? lang.split('-')[0] : null;
+        this.#config.locale = lang || null;
       }
 
       if (! this.#config.locale) {
@@ -767,27 +769,24 @@ class SimpleConsent {
       return;
     }
 
-    for (let prop in actions) {
-
-      if (! actions.hasOwnProperty(prop) || ! actions[prop] || ! this.#actions.includes(prop))
+    for (let prop of this.#config.actions[template]._order) {
+      if (!actions.hasOwnProperty(prop) || !actions[prop] || !this.#actions.includes(prop)) {
         continue;
-
-      let action = document.createElement('button');
-      
-      if (this.#config.theme.actionClasses[prop]) {
-        
-        if (this.#config.theme.actionClasses._all)
-          action.classList.add(...this.#config.theme.actionClasses._all.split(' '));
-
-        action.classList.add(...this.#config.theme.actionClasses[prop].split(' '));
-
       }
-
+  
+      let action = document.createElement('button');
+  
+      if (this.#config.theme.actionClasses[prop]) {
+        if (this.#config.theme.actionClasses._all) {
+          action.classList.add(...this.#config.theme.actionClasses._all.split(' '));
+        }
+        action.classList.add(...this.#config.theme.actionClasses[prop].split(' '));
+      }
+  
       action.setAttribute('data-consent-action', prop);
       action.textContent = this.#config.text[template].actions[prop];
-
+  
       target.append(action);
-
     }
 
   }
