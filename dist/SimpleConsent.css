@@ -139,6 +139,7 @@
 }
 
 [data-consent-tpl] [data-consent-action]:not([class]) {
+  appearance: none;
   padding: var(--consent-button-padding);
   font-size: var(--consent-button-font-size);
   border-radius: var(--consent-button-border-radius);

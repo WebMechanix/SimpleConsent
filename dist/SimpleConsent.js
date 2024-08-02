@@ -13,6 +13,11 @@ class SimpleConsent {
 
   static #instance = null;
 
+  #_multiConfig = null;
+  #_namespace = 'simple-consent';
+  #_version = 1.0;
+  #_geo = null;
+  
   #actions = [
     'acceptAll',
     'acceptSelected',
@@ -20,10 +25,17 @@ class SimpleConsent {
     'denyAll',
     'saveSettings',
     'showSettings',
-  ];
+  ];  
 
   #config = {
 
+    /**
+     * Actions
+     * 
+     * The actions object is used to configure the action buttons that are displayed in the consent UI.
+     * Each action can be enabled or disabled by setting the value to `true` or `false`.
+     * The order of the actions (left-to-right) can be customized by setting the `_order` array.
+     */
     actions: {
       banner: {
         _order: ['showSettings', 'denyAll', 'acceptAll'],
@@ -99,7 +111,7 @@ class SimpleConsent {
      * Implied Consent
      * 
      * If the user performs one of the actions listed in this array, they will be considered to have given consent.
-     * Possible values: `''click', 'close', scroll'`
+     * Possible values: `''click', 'banner.close', scroll'`
      * 
      * @default boolean false
      */
@@ -147,8 +159,11 @@ class SimpleConsent {
      */
     locale: null,
 
+
+    geoLocate: null,
+
     /**
-     * Location
+     * Geo Location
      * 
      * The location of the user. This is used to determine the user's country code for regional compliance needs.
      * This value can be set manually or automatically detected based on the user's IP address.
@@ -156,9 +171,7 @@ class SimpleConsent {
      * Value should be an ISO 3166-1 alpha-2 country code (e.g., 'US', 'GB', 'DE', etc...), 
      * or a combination of ISO 3166-1 alpha-2 + a regional code (e.g., 'US-CA', 'GB-ENG', 'DE-BY', etc...).
      */
-    location: null,
-
-    locationLookup: function() {},
+    geoLocation: null,
 
     /** 
      * Callback: onInit
@@ -242,7 +255,7 @@ class SimpleConsent {
               </div>
               `,
       modal:  `
-              <div class="consent-modal" role="dialog" aria-labelledby=consentModalHeading" aria-describedby="consentModalDescription">
+              <div class="consent-modal" aria-labelledby="consentModalHeading" aria-describedby="consentModalDescription">
                 <div class="consent-ui__content">
                   <div class="consent-ui__header">
                     <h2 class="consent-modal__heading" id="consentModalHeading">{{ heading }}</h2>
@@ -437,27 +450,16 @@ class SimpleConsent {
 
   constructor(config) {
 
-    console.time('SimpleConsent');
+    console.time(`⏱️ ${this.#name}`);
 
     if (SimpleConsent.#instance) 
       return SimpleConsent.#instance;
 
-    this.#config = this.#deepMerge(this.#config, config);
-    this.#config.cookieDomain = this.#resolveCookieDomain();
-
-    this.#settings = this.getStoredSettings();
-
     SimpleConsent.#instance = this;
 
-    this.#maybeLocalize();
-    this.#mount();
-    this.#bindConsentActions();
-    this.#bindCustomEvents();
+    this.#resolveConfig(config);
 
-    if (typeof this.#config.onInit == 'function') 
-      this.#config.onInit(this.#settings);
-
-    console.timeEnd('SimpleConsent');
+    console.timeEnd(`⏱️ ${this.#name}`);
 
   }
 
@@ -477,37 +479,9 @@ class SimpleConsent {
     }
   }
 
-  #bindConsentActions() {
-
-    document.addEventListener('click', (e) => {
-
-      if (e.target.matches('[data-consent-action]')) {
-        
-        e.preventDefault();
-
-        this[{
-          showSettings: 'show',
-          acceptAll: 'accept',
-          acceptSelected: 'save',
-          denyAll: 'deny',
-          saveSettings: 'save',
-        }[e.target.dataset.consentAction]]();
-        
-      }        
-
-      if (e.target.matches('[data-consent-close]')) {
-        this.#close(e.target);
-      }
-
-    });
-
-   this.#bindImplicitConsentBehavior();
-
-  }
-
   #bindCustomEvents() {
 
-    document.addEventListener('consent:modal.show.before', (e) => {
+    document.addEventListener(`${this.#_namespace}:modal.show.before`, (e) => {
 
       const actions = e.detail.querySelectorAll('[data-consent-action]');
 
@@ -529,16 +503,51 @@ class SimpleConsent {
 
     });
 
-    document.addEventListener('consent:modal.close.before', (e) => {
+    document.addEventListener(`${this.#_namespace}:modal.close.before`, (e) => {
 
       if (! this.#settings)
         this.show('banner');
 
     });
 
+    document.addEventListener(`${this.#_namespace}:update`, (e) => {
+      this.#pushToDataLayer('update');
+    });
+
+    document.addEventListener(`${this.#_namespace}:init`, (e) => {
+      this.#pushToDataLayer('load');
+    });
+
   }
 
-  #bindImplicitConsentBehavior() {
+  #bindExplicitActions() {
+
+    document.addEventListener('click', (e) => {
+
+      if (e.target.hasAttribute('data-consent-action')) {
+        
+        e.preventDefault();
+
+        this[{
+          showSettings: 'show',
+          acceptAll: 'accept',
+          acceptSelected: 'save',
+          denyAll: 'deny',
+          saveSettings: 'save',
+        }[e.target.dataset.consentAction]]();
+        
+      }        
+
+      if (e.target.hasAttribute('data-consent-close')) {
+        e.preventDefault();
+        this.#close(e.target);
+      }
+
+    });
+
+  }
+
+  #bindImplicitActions() {
 
     // We only want to bind the listeners if the user has not already set their preferences
     // and if the impliedConsentOn array is not empty/falsy.
@@ -589,24 +598,39 @@ class SimpleConsent {
     if (this.#config.impliedConsentOn.includes('click'))
       document.addEventListener('mousedown', acceptOnBodyClick);
 
-
     const acceptOnClose = (e) => {
-      
-      if (! e.target.hasAttribute('data-consent-close')) 
-        return;
-
       consentToAll();
-
     }
 
-    if (this.#config.impliedConsentOn.includes('close'))
-      document.addEventListener('click', acceptOnClose);
+    if (this.#config.impliedConsentOn.includes('banner.close'))
+      document.addEventListener(`${this.#_namespace}:banner.close.after`, acceptOnClose);
 
     const removeEventListeners = () => {
       document.removeEventListener('mousedown', acceptOnBodyClick);
-      document.removeEventListener('click', acceptOnClose);
+      document.removeEventListener(`${this.#_namespace}:banner.close.after'`, acceptOnClose);
       document.removeEventListener('scroll', acceptOnScroll);
     }
+
+  }
+
+  #buildConsentStatusObject() {
+
+    let obj = {};
+      
+    if (this.#settings) {
+
+      for (let setting in this.#settings) {
+        
+        if (! this.#settings.hasOwnProperty(setting) || setting.startsWith('_')) 
+          continue;
+
+        obj[setting] = this.#settings[setting] ? 'granted' : 'denied';
+      
+      }
+
+    }
+
+    return obj;
 
   }
 
@@ -620,11 +644,11 @@ class SimpleConsent {
     if (! element)
       return;
 
-    this.#emit(`consent:${element.dataset.consentTpl}.close.before`, element);
+    this.#emit(`${element.dataset.consentTpl}.close.before`, element);
 
     element.classList.remove('is-open');
 
-    this.#emit(`consent:${element.dataset.consentTpl}.close.after`, element);
+    this.#emit(`${element.dataset.consentTpl}.close.after`, element);
 
   }
 
@@ -646,20 +670,52 @@ class SimpleConsent {
     return target;
   }
 
-  #emit(eventName, data) {
-    const event = new CustomEvent(eventName, { detail: data });
-    document.dispatchEvent(event);
+  get #name() {
+    return this.constructor.name;
   }
 
-  #pushConsentUpdate(event) {
+  #determineDefaultSettings() {
+      
+    this.#settings = this.settings;
 
-    this.#config.dataLayer.push({
-      event: 'consent.update',
-      consent: {
-        settings: this.#settings,
-      },
+    // If we have settings, we don't need to do anything else.
+    if (this.#settings)
+      return;
+
+    this.#settings = {};
+
+    this.#config.consentModel = this.#config.consentModel.toLowerCase().trim();
+
+    // Saftey net for invalid consentModel values
+    if (! ['opt-in', 'opt-out'].includes(this.#config.consentModel)) {
+      console.info(`⚠️ ${this.#name}: Invalid consentModel config value "${this.#config.consentModel}". Defaulting to "opt-in".`);
+      this.#config.consentModel = 'opt-in';
+    }
+
+    let defaultSetting = {
+      'opt-in': false,
+      'opt-out': true,
+    }[this.#config.consentModel];
+
+    // Respect the user's Global Privacy Control setting
+    // @todo - make sure that we can fine-tune by type if desired.
+    if (navigator.globalPrivacyControl) {
+      defaultSetting = navigator.globalPrivacyControl ? false : defaultSetting;
+      this.#settings['_gpc'] = navigator.globalPrivacyControl;
+      console.info(`ℹ️ ${this.#name}: GPC signal detected, setting applicable types to "denied" (false) =>`, this.#settings);
+    } else {
+      console.info(`ℹ️ ${this.#name}: Settings determined by "${this.#config.consentModel}" consentModel (${defaultSetting}) =>`, this.#settings);
+    }
+
+    this.#types.forEach((type) => {
+      this.#settings[type.key] = type.required ? true : defaultSetting;
     });
 
+  }
+
+  #emit(eventName, detail) {
+    const event = new CustomEvent(`${this.#_namespace}:${eventName}`, { detail });
+    document.dispatchEvent(event);
   }
 
   #getServicesGroupedByType() {
@@ -695,7 +751,7 @@ class SimpleConsent {
       }
 
       if (! this.#config.locale) {
-        console.info('SimpleConsent: No locale set or detected. Using defaults.');
+        console.info(`⚠️ ${this.#name}: No locale set or detected on html "lang" attribute. Using defaults.`);
         return;
       }
 
@@ -704,7 +760,7 @@ class SimpleConsent {
       const l10n = this.#config.l10n[this.#config.locale];
   
       if (! l10n) {
-        console.info(`SimpleConsent: No localization found for "${this.#config.locale}". Using defaults.`);
+        console.info(`⚠️ ${this.#name}: No l10n key found for "${this.#config.locale}". Using defaults.`);
         return;
       }
   
@@ -723,13 +779,20 @@ class SimpleConsent {
 
     const root = document.createElement('div');
     root.id = this.#config.theme.rootId;
-    root.classList.add(...this.#config.theme.rootClass.split(' ')); // @todo: Allow for custom root element classes
     
+    root.className = this.#config.theme.rootClass;
+    this.#addAttributes(root, { 
+      'data-consent-tpl': 'root',
+    });
+
     // Modal
     this.#ui.modal = this.#parseTemplate('modal', this.#config.text.modal);
+    this.#addAttributes(this.#ui.modal, {
+      'role': 'dialog',
+    });
 
     this.#mountActions(this.#ui.modal);
-    this.#mountConsentTypes();
+    this.#mountConsentTypes(this.#settings, this.#ui);
 
     root.appendChild(this.#ui.modal);
 
@@ -760,10 +823,12 @@ class SimpleConsent {
     const template = element.dataset.consentTpl;
     const actions = this.#config.actions[template];
 
+    // console.log(`${template} Actions =>`, this.#config.text);
+
     const target = element.querySelector('[data-consent-actions]');
 
     if (! target) {
-      console.warn(`SimpleConsent Template Error: "${template}" does not contain a [data-consent-actions] target.`);
+      console.warn(`${this.#name}: Template Error - "${template}" does not contain a [data-consent-actions] target.`);
       return;
     }
 
@@ -799,11 +864,14 @@ class SimpleConsent {
         continue;
 
       const tpl = this.#parseTemplate('type', type);
-      const input = tpl.querySelector('input');
-      this.#addAttributes(tpl, { 'data-consent-type': type.key });
 
-      if (this.#settings && this.#settings[type.key])
-        input.checked = true;
+      this.#addAttributes(tpl, { 
+        'data-consent-type': type.key 
+      });
+
+      const input = tpl.querySelector('input');
+
+      input.checked = this.#settings[type.key] ? true : false;
 
       if (type.required) {
         input.disabled = true;
@@ -844,11 +912,94 @@ class SimpleConsent {
 
   }
 
+  #pushToDataLayer(event) {
+
+    let payload = this.#buildConsentStatusObject();
+  
+    payload.event = `${this.#_namespace}.${event}`;
+    payload.consentModel = this.#config.consentModel;
+
+    this.#config.dataLayer.push(payload);
+
+  }
+
+  async #resolveConfig(config) {
+    
+    if (config._default) {
+
+      this.#_multiConfig = config;
+      config = config._default;
+
+      this.#config = this.#deepMerge(this.#config, config);
+
+      let router = this.#_multiConfig._router;
+
+      if (! router)
+        console.warn('SimpleConsent: No `_router` found in multi-config object. Will default to base config.');
+
+      if (this.#config.geoLocate && typeof this.#config.geoLocate == 'function') {
+
+        this.#config.geoLocate().then((geo) => {
+
+          this.#_geo = geo;
+
+          if (! router) {
+            this.#init();
+            return;
+          }
+
+          router.forEach((route) => {
+            
+            if (! route.geoMatch)
+              return;
+
+            if (geo.match(route.geoMatch) && this.#_multiConfig.hasOwnProperty(route.config))
+              this.#config = this.#deepMerge(this.#config, this.#_multiConfig[route.config]);
+
+          });
+
+          this.#init();
+
+        });
+
+      }
+
+    } else {
+      this.#config = this.#deepMerge(this.#config, config);
+      this.#init();
+    }
+
+  }
+
+  #init() {
+
+    this.#config.cookieDomain = this.#resolveCookieDomain();
+
+    this.#determineDefaultSettings();
+
+    this.#bindCustomEvents();
+    this.#bindExplicitActions();
+    this.#bindImplicitActions();
+
+    this.#maybeLocalize();
+    this.#mount();
+
+    if (typeof this.#config.onInit == 'function') {
+      this.#config.onInit(this.#settings);
+      this.#emit('init', this.#settings);
+    }
+
+  }
+
   #resolveCookieDomain() {
     if (this.#config.cookieDomain) 
         return this.#config.cookieDomain;
 
     const hostname = window.location.hostname;
+
+    if (hostname === 'localhost')
+      return '';
+
     const domainParts = hostname.split('.').reverse();
 
     // Handle TLDs with two segments (e.g., co.uk)
@@ -860,32 +1011,13 @@ class SimpleConsent {
     return rootDomain;
   }
 
-  save(implicit = false) {
+  #resetSettings() {
+    document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+    this.#settings = null;
 
-    if (typeof this.#config.onUpdateBefore == 'function') 
-      this.#config.onUpdateBefore(this.#settings);
+    this.#determineDefaultSettings();
 
-    for (let input of this.#ui.settings) {
-      
-      if (! this.#settings)
-        this.#settings = {};
-      
-      this.#settings[input.name] = input.checked;
-
-    }
-
-    this.#settings._datetime = new Date().toISOString();
-    this.#settings._location = this.#config.location;
-    this.#settings._id = crypto.randomUUID();
-    this.#settings._mode = implicit ? 'implicit' : 'explicit';
-
-    document.cookie = `${this.#config.cookieName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
-
-    if (typeof this.#config.onUpdateAfter == 'function') 
-      this.#config.onUpdateAfter(this.#settings);
-
-    setTimeout(() => this.#hideAll(), 200);
-
+    
   }
 
   accept() {
@@ -905,24 +1037,42 @@ class SimpleConsent {
     this.save();
   }
 
-  forget() {
+
+
+  reset() {
+    
     document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+    this.#settings = null;
+
+    this.#determineDefaultSettings();
+    this.#bindImplicitActions();
+
+    // @bug - this needs adjusted to read the default settings and update the UI accordingly. 
+    // It won't always be as simple as just setting the defaults based on the consentModel.
+    this.changeAll((this.#config.consentModel === 'opt-in') ? false : true);
+    this.show((this.#config.forceConsent) ? 'modal' : 'banner');
+
   }
 
-  getStoredSettings() {
+  get settings() {
+
+    if (this.#settings)
+      return this.#settings;
 
     let name = `${this.#config.cookieName}=`;
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
 
-    for(let i = 0; i <ca.length; i++) {
+    for (let i = 0; i <ca.length; i++) {
+
       let c = ca[i];
-      while (c.charAt(0) == ' ') {
+
+      while (c.charAt(0) == ' ')
         c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
+      
+      if (c.indexOf(name) == 0) 
         return JSON.parse(c.substring(name.length, c.length));
-      }
+      
     }
     
     return null;
@@ -938,12 +1088,57 @@ class SimpleConsent {
 
   }
 
+  save(implicit = false) {
+
+    if (typeof this.#config.onUpdateBefore == 'function') 
+      this.#config.onUpdateBefore(this.#settings);
+
+    if (! this.#settings)
+      this.#settings = {};
+
+    for (let input of this.#ui.settings) {
+
+      if (input.name == 'necessary')
+        continue; // we don't need to store the necessary setting - it's always true.
+      
+      this.#settings[input.name] = input.checked;
+
+      let status = input.checked ? 'granted' : 'denied';
+      this.#emit(`${input.name}.${status}`);
+
+    }
+
+    Object.entries({
+      _datetime: new Date().toISOString(),
+      _id: crypto.randomUUID(),
+      _model: `${this.#config.consentModel}/` + (implicit ? 'implicit' : 'explicit'),
+      _geo: this.#_geo,
+      _version: this.#_version,
+    }).forEach(([key, value]) => {
+      this.#settings[key] = value;
+    });
+
+    document.cookie = `${this.#config.cookieName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
+
+    this.#emit('update', this.#settings);
+
+    if (typeof this.#config.onUpdateAfter == 'function') 
+      this.#config.onUpdateAfter(this.#settings);
+
+    setTimeout(() => this.#hideAll(), 150);
+
+  }
+
   show(uiKey = 'modal') {
 
-    this.#emit(`consent:${uiKey}.show.before`, this.#ui[uiKey]);
+    this.#emit(`${uiKey}.show.before`, this.#ui[uiKey]);
     this.#ui[uiKey].classList.add('is-open');
-    this.#emit(`consent:${uiKey}.show.after`, this.#ui[uiKey]);
+    this.#emit(`${uiKey}.show.after`, this.#ui[uiKey]);
 
+  }
+
+  get config() {
+    return this.#config;
   }
 
 }
@@ -955,7 +1150,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (! script) 
     return;
 
-  const config = window[script.dataset.consentConfig] || {};
+  let config = window[script.dataset.consentConfig] || {};
+
   new SimpleConsent(config);
 
   // Clean up the global namespace
