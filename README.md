@@ -14,9 +14,11 @@ A large portion of this project is/was inspired by [Klaro](https://klaro.org). K
 
 ### ⚠️ LEGAL DISCLAIMER!
 
-**The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**. 
+**The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
 
-This library is a tool to help technical marketers and companies comply with the law using a lightweight alternative to something like OneTrust or CookieBot. As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager. 
+This library is a tool to help technical marketers and companies comply with the law using a lightweight alternative to something like OneTrust or CookieBot. As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager.
+
+**It cannot be understated to always (even if using a hosted CMP) to consult with a data privacy lawyer to ensure your consent banner configuration is compliant with regional data collection laws.**
 
 ### Library Principles
 

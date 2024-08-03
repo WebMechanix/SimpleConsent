@@ -1,12 +1,9 @@
 /**!
  * SimpleConsent.js
  * 
- * Most consent/cookie banners are too bloated and try to be "everything to everyone" - SimpleConsent is hyperfocused on ease of use, 
- * particularly with Google Tag Manager's "Consent" APIs.
- * 
  * Author: Derek Cavaliero (@derekcavaliero)
  * Repository: https://github.com/derekcavaliero/SimpleConsent
- * Version: 1.0.beta
+ * Version: 1.0.alpha
  * License: MIT
  */
 class SimpleConsent {
@@ -79,6 +76,86 @@ class SimpleConsent {
     consentModel: 'opt-in',
 
     /**
+     * If the user performs one of the actions listed in this array, they will be considered to have given consent.
+     * Possible values: `''click', 'banner.close', scroll'`
+     * 
+     * @default boolean false
+     */
+    consentOnImplicitAction: false,
+
+    /**
+     * If set to true, the consent modal will be shown immediately and the user will be required 
+     * to make a selection before using the website.
+     * 
+     * @default boolean false
+     */
+    consentRequired: false,
+
+    /**
+     * Content
+     * 
+     * This object contains the default content used in various parts of the consent manager UI.
+     * It includes text for the banner, modal, and URLs for privacy-related documents.
+     * 
+     * @property {Object} content - The text object.
+     * @property {Object} content.banner - The text content for the consent banner.
+     * @property {string} content.banner.heading - The heading text for the banner.
+     * @property {string} content.banner.description - The description text for the banner.
+     * @property {Object} content.banner.actions - The action buttons text for the banner.
+     * @property {string} content.banner.actions.acceptAll - The text for the "Accept All" button.
+     * @property {string} content.banner.actions.denyAll - The text for the "Decline All" button.
+     * @property {string} content.banner.actions.showSettings - The text for the "Edit Settings" button.
+     * 
+     * @property {Object} content.modal - The text content for the consent modal.
+     * @property {string} content.modal.heading - The heading text for the modal.
+     * @property {string} content.modal.description - The description text for the modal.
+     * @property {string} content.modal.toggleAll - The text for the "Enable/Disable All" toggle.
+     * @property {Object} content.modal.actions - The action buttons text for the modal.
+     * @property {string} content.modal.actions.acceptAll - The text for the "Accept All" button.
+     * @property {string} content.modal.actions.acceptSelected - The text for the "Accept Selected" button.
+     * @property {string} content.modal.actions.denyAll - The text for the "Decline All" button.
+     * @property {string} content.modal.actions.save - The text for the "Save" button.
+     * 
+     * @property {Object} content.urls - The URLs for privacy-related documents.
+     * @property {string} content.urls.privacyPolicy - The URL for the privacy policy.
+     * @property {string} content.urls.termsOfService - The URL for the terms of service.
+     * @property {string} content.urls.cookiePolicy - The URL for the cookie policy.
+     */
+    content: {
+      banner: {
+        heading: 'Privacy Notice',
+        description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our website usage. This information is also shared with advertising partners through the use of tracking scripts/pixels.',
+        actions: {
+          acceptAll: 'Accept All',
+          denyAll: 'Decline All',
+          showSettings: 'Edit Settings',
+        },
+      },
+      modal: {
+        heading: 'Consent & Privacy Settings',
+        description: 'This website uses services that utilize storage features in your browser (via cookies or other browser storage functionality) to collect information. You can choose to grant or deny certain types of data collection using the controls below.',
+        toggleAll: 'Enable/Disable All',
+        actions: {
+          acceptAll: 'Accept All',
+          acceptSelected: 'Accept Selected',
+          denyAll: 'Decline All',
+          saveSettings: 'Save Preferences',
+        },
+      },
+      links: {
+        privacyPolicy: {
+          text: 'Privacy Policy',
+          url: '#/privacy-policy',
+        },
+        termsOfService: null,
+        cookiePolicy: {
+          text: 'Cookie Policy',
+          url: '#/cookie-policy',
+        },
+      },
+    },
+
+    /**
      * Cookie Domain
      * 
      * The domain to set the consent cookie on. If null, the cookie domain will be set to the root domain.
@@ -106,31 +183,19 @@ class SimpleConsent {
     cookieName: 'simple_consent',   
 
     /**
-     * Data Layer Global
-     * 
-     * The global variable name for the Google Tag Manager (GTM) `dataLayer` object.
-     * This only needs to be customized if not using the default global variable.
+     * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
+     * @default null
      */
-    dataLayer: window.dataLayer || [],
+    geoLocate: null,
 
     /**
-     * Force Consent
-     * 
-     * If set to true, the consent modal will be shown immediately and the user will be required to make a selection before using the website.
-     * 
-     * @default boolean false
+     * Used to configure settings specific to Google Tag Manager.
+     * Things like the dataLayer object, container ID, etc..
      */
-    forceConsent: false,
-
-    /**
-     * Implied Consent
-     * 
-     * If the user performs one of the actions listed in this array, they will be considered to have given consent.
-     * Possible values: `''click', 'banner.close', scroll'`
-     * 
-     * @default boolean false
-     */
-    impliedConsentOn: false,
+    gtm: {
+      loadContainer: false,
+      containerId: null,
+    },
     
     /**
      * Localization object
@@ -173,12 +238,6 @@ class SimpleConsent {
      * @default null
      */
     locale: null,
-
-    /**
-     * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
-     * @default null
-     */
-    geoLocate: null,
 
     /** 
      * Callback: onInit
@@ -228,9 +287,7 @@ class SimpleConsent {
      * 
      * @default []
      */
-    services: [],
-
-    showEmptyTypes: false,
+    services: {},
 
     /**
      * Templates
@@ -284,7 +341,7 @@ class SimpleConsent {
                 <div class="consent-switch">
                   <input type="checkbox" role="switch" id="type-{{ key }}" name="{{ key }}">
                   <div class="consent-switch__text">
-                    <label for="type-{{ key }}">{{ label }}</label>
+                    <label for="type-{{ key }}">{{ name }}</label>
                     <div>{{ description }}</div>
                     <div data-consent-type-services></div>
                   </div>
@@ -293,88 +350,20 @@ class SimpleConsent {
               `,
     },
 
-    /**
-     * Content
-     * 
-     * This object contains the default content used in various parts of the consent manager UI.
-     * It includes text for the banner, modal, and URLs for privacy-related documents.
-     * 
-     * @property {Object} content - The text object.
-     * @property {Object} content.banner - The text content for the consent banner.
-     * @property {string} content.banner.heading - The heading text for the banner.
-     * @property {string} content.banner.description - The description text for the banner.
-     * @property {Object} content.banner.actions - The action buttons text for the banner.
-     * @property {string} content.banner.actions.acceptAll - The text for the "Accept All" button.
-     * @property {string} content.banner.actions.denyAll - The text for the "Decline All" button.
-     * @property {string} content.banner.actions.showSettings - The text for the "Edit Settings" button.
-     * 
-     * @property {Object} content.modal - The text content for the consent modal.
-     * @property {string} content.modal.heading - The heading text for the modal.
-     * @property {string} content.modal.description - The description text for the modal.
-     * @property {string} content.modal.toggleAll - The text for the "Enable/Disable All" toggle.
-     * @property {Object} content.modal.actions - The action buttons text for the modal.
-     * @property {string} content.modal.actions.acceptAll - The text for the "Accept All" button.
-     * @property {string} content.modal.actions.acceptSelected - The text for the "Accept Selected" button.
-     * @property {string} content.modal.actions.denyAll - The text for the "Decline All" button.
-     * @property {string} content.modal.actions.save - The text for the "Save" button.
-     * 
-     * @property {Object} content.urls - The URLs for privacy-related documents.
-     * @property {string} content.urls.privacyPolicy - The URL for the privacy policy.
-     * @property {string} content.urls.termsOfService - The URL for the terms of service.
-     * @property {string} content.urls.cookiePolicy - The URL for the cookie policy.
-     */
-    content: {
-      links: {
-        privacyPolicy: {
-          text: 'Privacy Policy',
-          url: '#/privacy-policy',
-        },
-        termsOfService: null,
-        cookiePolicy: {
-          text: 'Cookie Policy',
-          url: '#/cookie-policy',
-        },
-      },
-      banner: {
-        heading: 'Privacy Notice',
-        description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our website usage. This information is also shared with some of our advertising partners throught the use of tracking pixels.',
-        actions: {
-          acceptAll: 'Accept All',
-          denyAll: 'Decline All',
-          showSettings: 'Edit Settings',
-        },
-      },
-      modal: {
-        heading: 'Consent & Privacy Settings',
-        description: 'This website uses services that utilize storage features in your browser (via cookies or other browser storage functionality) to collect information. You can choose to grant or deny certain types of data collection using the controls below.',
-        toggleAll: 'Enable/Disable All',
-        actions: {
-          acceptAll: 'Accept All',
-          acceptSelected: 'Accept Selected',
-          denyAll: 'Decline All',
-          saveSettings: 'Save Preferences',
-        },
-      },
-      urls: {
-        privacyPolicy: '#/privacy-policy',
-        termsOfService: '#/terms-of-service',
-        cookiePolicy: '#/cookie-policy',
-      },
-    },
+    types: {},
 
     /**
-     * Theme
+     * UI
      * 
-     * This object contains the theme settings for the consent manager UI.
-     * It allows customization of action button classes, banner placement, and color scheme.
+     * This object contains settings for the consent manager UI.
+     * It allows customization of action button classes, banner placement, etc...
      * 
-     * @property {Object} theme - The theme settings object.
-     * @property {string|null} theme.actionClasses - CSS classes to be applied to action buttons. If `null`, default classes are used.
-     * @property {Object} theme.placement - The placement settings for the banner.
-     * @property {Array<string>} theme.placement.banner - An array specifying the position of the banner. Possible values include 'top', 'bottom', 'left', 'right'.
-     * @property {string} theme.scheme - The color scheme for the UI. Possible values are 'light' or 'dark'.
+     * @property {Object} ui - The ui settings object.
+     * @property {string|null} ui.actionClasses - CSS classes to be applied to action buttons. If `null`, default classes are used.
+     * @property {Object} ui.placement - The placement settings for the banner.
+     * @property {Array<string>} ui.placement.banner - An array specifying the position of the banner. Possible values include 'top', 'bottom', 'left', 'right'.
      */
-    theme: {
+    ui: {
       actionClasses: {
         _all: null,
         acceptAll: null,
@@ -388,7 +377,7 @@ class SimpleConsent {
       },
       rootClass: 'simple-consent',
       rootId: 'simple-consent',
-      scheme: 'light',
+      showBranding: true,
     },
 
   };
@@ -405,49 +394,14 @@ class SimpleConsent {
    */
   #settings = null;
 
-  #types = [
-    {
+  #types = {
+    necessary: {
       key: 'necessary',
-      label: 'Strictly Necessary',
-      description: 'These cookies/services are required for our website(s) to function and cannot be disabled.',
+      name: 'Strictly Necessary',
+      description: 'These cookies/services are required for our website(s) to function properly and cannot be disabled.',
       required: true,
-    },
-    {
-      key: 'analytics_storage',
-      label: 'Analytics Storage',
-      description: 'Enables storage, such as cookies and/or local/session storage related to analytics, for example, visit duration, and pages viewed.',
-    },
-    {
-      key: 'ad_storage',
-      label: 'Advertising Storage',
-      description: 'Enables storage, such as cookies and/or local/session storage related to advertising.',
-    },
-    {
-      key: 'ad_personalization',
-      label: 'Advertising Personalization',
-      description: 'Set consent for personalized advertising through the use of 3rd party cookies set by our partners.',
-    },
-    {
-      key: 'ad_user_data',
-      label: 'Ad User Data',
-      description: 'Sets consent for sending user data to our advertising partners for online advertising purposes.',
-    },
-    {
-      key: 'functionality_storage',
-      label: 'Functionality Storage',
-      description: 'Enables storage that supports the functionality of the website or app e.g. language settings.',
-    },
-    {
-      key: 'personalization_storage',
-      label: 'Personalization Storage',
-      description: 'Enables storage related to personalization e.g. video recommendations, and account preferences.',
-    },
-    {
-      key: 'security_storage',
-      label: 'Security Storage',
-      description: 'Enables services/storage related to security such as authentication functionality, fraud prevention, and other user protection.',
-    },
-  ];
+    }
+  };
 
   /**
    * UI Elements
@@ -536,6 +490,31 @@ class SimpleConsent {
 
   }
 
+  #init() {
+    
+    this.#config.cookieDomain = this.#resolveCookieDomain();
+    this.#types = this.#deepMerge(this.#types, this.#config.types);
+
+    this.#gtmSetDataLayer();
+
+    this.#bindCustomEvents();
+
+    this.#loadSettings();
+    this.#gtmLoadConainer();
+    
+    this.#bindExplicitActions();
+    this.#bindImplicitActions();
+    
+    this.#maybeLocalize();
+    this.#mount();
+
+    if (typeof this.#config.onInit == 'function') {
+      this.#config.onInit(this.#settings);
+      this.#emit('init', this.#settings);
+    }
+
+  }
+
   /* -------------
    * Private API
    * ------------- */
@@ -578,12 +557,13 @@ class SimpleConsent {
 
     });
 
-    document.addEventListener(`${this.#_namespace}:update`, (e) => {
-      this.#pushToDataLayer('update');
+    document.addEventListener(`${this.#_namespace}:settings.update`, (e) => {
+      this.#gtmPush('update');
     });
 
-    document.addEventListener(`${this.#_namespace}:init`, (e) => {
-      this.#pushToDataLayer('load');
+    document.addEventListener(`${this.#_namespace}:settings.load`, (e) => {
+      console.log(e.type, e.detail);
+      this.#gtmPush('default');
     });
 
   }
@@ -618,8 +598,8 @@ class SimpleConsent {
   #bindImplicitActions() {
 
     // We only want to bind the listeners if the user has not already set their preferences
-    // and if the impliedConsentOn array is not empty/falsy.
-    if (! this.#config.impliedConsentOn || this.#settings)
+    // and if the consentOnImplicitAction array is not empty/falsy.
+    if (! this.#config.consentOnImplicitAction || this.#settings)
       return;
 
     const consentToAll = () => {
@@ -651,7 +631,7 @@ class SimpleConsent {
   
     const debouncedAcceptOnScroll = debounce(acceptOnScroll, 100);
 
-    if (this.#config.impliedConsentOn.includes('scroll'))
+    if (this.#config.consentOnImplicitAction.includes('scroll'))
       document.addEventListener('scroll', debouncedAcceptOnScroll);
 
     const acceptOnBodyClick = (e) => {
@@ -663,14 +643,14 @@ class SimpleConsent {
 
     }
 
-    if (this.#config.impliedConsentOn.includes('click'))
+    if (this.#config.consentOnImplicitAction.includes('click'))
       document.addEventListener('mousedown', acceptOnBodyClick);
 
     const acceptOnClose = (e) => {
       consentToAll();
     }
 
-    if (this.#config.impliedConsentOn.includes('banner.close'))
+    if (this.#config.consentOnImplicitAction.includes('banner.close'))
       document.addEventListener(`${this.#_namespace}:banner.close.after`, acceptOnClose);
 
     const removeEventListeners = () => {
@@ -704,7 +684,7 @@ class SimpleConsent {
 
   #close(target) {
 
-    if (this.#config.forceConsent && ! this.#settings)
+    if (this.#config.consentRequired && ! this.#settings)
       return;
 
     const element = target.closest('[data-consent-tpl]');
@@ -738,27 +718,67 @@ class SimpleConsent {
     return target;
   }
 
+  #gtmSetDataLayer() {
+
+    // @consider - custom dataLayer name support. Hardly anyone does this.
+    // Simo's "Consent Mode (Google tags)" tag template uses "dataLayer" as the default and it can't be customized.
+    window.dataLayer = window.dataLayer || [];
+
+    // if (! window.gtag)
+    //   window.gtag = function() { window.dataLayer.push(arguments); }
+
+  }
+
+  #gtmLoadConainer() {
+    
+    if (! this.#config.gtm.loadContainer || ! this.#config.gtm.containerId)
+      return;
+
+    (function(w, d, s, l, i){
+  
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+    
+      var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),
+          dl=l!='dataLayer'?'&l='+l:'';
+    
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+      
+    })(window, document, 'script', 'dataLayer', this.#config.gtm.containerId);
+
+  }
+
+  #gtmPush(event) {
+    
+    // window.gtag('consent', event, this.#convertSettingsToStatusObject());
+
+    let payload = this.#convertSettingsToStatusObject();
+
+    /**
+     * This looks odd - but its intentional.
+     * 
+     * If the library is responsible for loading the GTM contianer, we can make sure the consent settings are
+     * present in the dataLayer before the container is loaded by pushing the consent data WITHOUT an event name.
+     * Doing this will enable the use of Initialization, All Pages, and DOM Ready triggers in GTM instead of having to wait for the consent event.
+     */
+    if (! this.#config.gtm.loadContainer && event == 'default')
+      payload.event = `${this.#_namespace}.${event}`;
+
+    payload.consentModel = this.#config.consentModel;
+
+    window.dataLayer.push(payload);
+
+  }
+
   #emit(eventName, detail) {
     const event = new CustomEvent(`${this.#_namespace}:${eventName}`, { detail });
     document.dispatchEvent(event);
   }
 
-  #getServicesGroupedByType() {
-
-    const services = {};
-
-    for (let service of this.#config.services) {
-      for (let type of service.types) {
-        if (! services[type]) {
-          services[type] = [];
-        }
-        services[type].push(service);
-      }
-    }
-
-    return services;
-
-  }
+  
 
   #hideAll() {
     this.hide('modal');
@@ -770,8 +790,10 @@ class SimpleConsent {
     this.#settings = this.settings;
     
     // If we have settings, we don't need to do anything else.
-    if (this.#settings) 
+    if (this.#settings) {
+      this.#emit('settings.load', this.#settings);
       return;
+    }
     
     this.#settings = {};
 
@@ -798,9 +820,11 @@ class SimpleConsent {
       console.info(`ℹ️ ${this.#name}: Settings determined by "${this.#config.consentModel}" consentModel (${defaultSetting}) =>`, this.#settings);
     }
 
-    this.#types.forEach((type) => {
-      this.#settings[type.key] = type.required ? true : defaultSetting;
-    });
+    for (let [typeKey, type] of Object.entries(this.#types)) {
+      this.#settings[typeKey] = type.required ? true : defaultSetting;
+    }
+
+    this.#emit('settings.load', this.#settings);
 
   }
 
@@ -843,12 +867,11 @@ class SimpleConsent {
       if (l10n.content) 
         this.#config.content = this.#deepMerge(this.#config.content, l10n.content);
   
-      // if (l10n.services) {
-      //   this.#config.services = l10n.services;
-      // }
+      if (l10n.services)
+        this.#config.services = l10n.services;
   
-      // if (l10n.types) {
-      //   this.#types = l10n.types;
+      if (l10n.types)
+        this.#types = l10n.types;
   }
 
   /**
@@ -860,9 +883,9 @@ class SimpleConsent {
   #mount() {
 
     const root = document.createElement('div');
-    root.id = this.#config.theme.rootId;
+    root.id = this.#config.ui.rootId;
     
-    root.className = this.#config.theme.rootClass;
+    root.className = this.#config.ui.rootClass;
     this.#addAttributes(root, { 
       'data-consent-tpl': 'root',
     });
@@ -883,7 +906,7 @@ class SimpleConsent {
     this.#mountActions(this.#ui.banner);
     
     this.#addAttributes(this.#ui.banner, { 
-      'data-consent-placement': this.#config.theme.placement.banner.join(','),
+      'data-consent-placement': this.#config.ui.placement.banner.join(','),
     });
 
     root.appendChild(this.#ui.banner);
@@ -918,12 +941,12 @@ class SimpleConsent {
   
       let action = document.createElement('button');
   
-      if (this.#config.theme.actionClasses[prop]) {
+      if (this.#config.ui.actionClasses[prop]) {
 
-        if (this.#config.theme.actionClasses._all)
-          action.classList.add(...this.#config.theme.actionClasses._all.split(' '));
+        if (this.#config.ui.actionClasses._all)
+          action.classList.add(...this.#config.ui.actionClasses._all.split(' '));
 
-        action.classList.add(...this.#config.theme.actionClasses[prop].split(' '));
+        action.classList.add(...this.#config.ui.actionClasses[prop].split(' '));
         
       }
   
@@ -944,8 +967,11 @@ class SimpleConsent {
       return;
     
     for (let target of targets) {
+      
       let linkCount = 0;
+
       for (let link in links) {
+
         if (!links.hasOwnProperty(link) || !links[link])
           continue;
     
@@ -960,29 +986,34 @@ class SimpleConsent {
         a.textContent = links[link].text;
     
         target.appendChild(a);
+        
         linkCount++;
+
       }
     }
   }
 
   #mountConsentTypes() {
 
-    const services = this.#getServicesGroupedByType();
+    const services = this.#servicesByType;
 
-    for (let type of this.#types) {
+    for (let [typeKey, type] of Object.entries(this.#types)) {
 
-      if (! services[type.key] && ! type.required) 
-        continue;
+      // @review - this needs to be reworked to handle the new services object.
+      // if (! services[typeKey] && ! type.required) 
+      //   continue;
+
+      this.#types[typeKey].key = typeKey;
 
       const tpl = this.#parseTemplate('type', type);
 
       this.#addAttributes(tpl, { 
-        'data-consent-type': type.key 
+        'data-consent-type': typeKey
       });
 
       const input = tpl.querySelector('input');
 
-      input.checked = this.#settings[type.key] ? true : false;
+      input.checked = this.#settings[typeKey] ? true : false;
 
       if (type.required) {
         input.disabled = true;
@@ -1015,11 +1046,14 @@ class SimpleConsent {
       if (! content.hasOwnProperty(placeholder) || ['actions', 'required'].includes(placeholder))
         continue;
 
-      let pattern = new RegExp(`{{ ${placeholder} }}`, 'g');
+      if (typeof content[placeholder] !== 'string')
+        continue;
 
-      let sanitized = content[placeholder].replace(/<\/?[^>]+(>|$)/g, '');
+      // let pattern = new RegExp(`{{ ${placeholder} }}`, 'g');
+      // let sanitized = content[placeholder].replace(/<\/?[^>]+(>|$)/g, '');
+      // tpl.innerHTML = tpl.innerHTML.replace(pattern, sanitized);
 
-      tpl.innerHTML = tpl.innerHTML.replace(pattern, sanitized);
+      tpl.innerHTML = this.#safelyReplaceToken(tpl.innerHTML, placeholder, content[placeholder]);
 
     }
 
@@ -1028,37 +1062,6 @@ class SimpleConsent {
     });
     
     return tpl.content.firstChild;
-
-  }
-
-  #pushToDataLayer(event) {
-
-    let payload = this.#convertSettingsToStatusObject();
-  
-    payload.event = `${this.#_namespace}.${event}`;
-    payload.consentModel = this.#config.consentModel;
-
-    this.#config.dataLayer.push(payload);
-
-  }
-
-  #init() {
-
-    this.#config.cookieDomain = this.#resolveCookieDomain();
-
-    this.#loadSettings();
-
-    this.#bindCustomEvents();
-    this.#bindExplicitActions();
-    this.#bindImplicitActions();
-
-    this.#maybeLocalize();
-    this.#mount();
-
-    if (typeof this.#config.onInit == 'function') {
-      this.#config.onInit(this.#settings);
-      this.#emit('init', this.#settings);
-    }
 
   }
 
@@ -1082,20 +1085,62 @@ class SimpleConsent {
     return rootDomain;
   }
 
+  #escapeHTML(unsafeText) {
+    return unsafeText
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+  }
+
+  #safelyReplaceToken(tpl, token, content) {
+
+    let pattern = new RegExp(`{{ ${token} }}`, 'g');
+    let sanitized = content.replace(/<[^>]*>?/gm, '');
+    sanitized = this.#escapeHTML(sanitized);
+
+    return tpl.replace(pattern, sanitized);
+
+  }
+
+  get #servicesByType() {
+
+    const services = {};
+    
+    for (let [serviceKey, service] of Object.entries(this.#config.services)) {
+
+      for (let type of service.types) {
+        if (! services[type]) {
+          services[type] = [];
+        }
+        services[type].push(service);
+      }
+      
+    }
+
+    return services;
+
+  }
+
   #showOnMount() {
 
-    const forceConsent = this.#config.forceConsent;
+    const consentRequired = this.#config.consentRequired;
     const hasStoredSettings = this.#settings._datetime;
 
     if (hasStoredSettings)
       return;
 
-    if (! forceConsent) {
+    if (! consentRequired) {
       this.show('banner');
     } else {
       this.show('modal');
     }
 
+  }
+
+  #getType(key) {
+    return this.#types[key] || false;
   }
   
   /* -------------
@@ -1117,7 +1162,7 @@ class SimpleConsent {
 
   get settings() {
 
-    if (this.#settings)
+    if (this.#settings) 
       return this.#settings;
 
     let name = `${this.#config.cookieName}=`;
@@ -1159,7 +1204,7 @@ class SimpleConsent {
 
   hide(uiKey = 'modal') {
 
-    if (this.#config.forceConsent && ! this.#settings)
+    if (this.#config.consentRequired && ! this.#settings)
       return;
 
     this.#ui[uiKey].classList.remove('is-open');
@@ -1182,6 +1227,10 @@ class SimpleConsent {
 
   }
 
+  #boolToStatus(bool) {
+    return bool ? 'granted' : 'denied';
+  }
+
   save(implicit = false) {
 
     if (typeof this.#config.onUpdateBefore == 'function') 
@@ -1195,10 +1244,19 @@ class SimpleConsent {
       if (input.name == 'necessary')
         continue; // we don't need to store the necessary setting - it's always true.
       
+      const type = this.#getType(input.name);
+
       this.#settings[input.name] = input.checked;
 
+      if (type.mapTo && Array.isArray(type.mapTo)) {
+        type.mapTo.forEach((type) => {
+          this.#settings[type] = input.checked;
+          this.#emit(`${type}.${this.#boolToStatus(input.checked)}`);
+        });
+      }
+
       let status = input.checked ? 'granted' : 'denied';
-      this.#emit(`${input.name}.${status}`);
+      this.#emit(`${input.name}.${this.#boolToStatus(input.checked)}`);
 
     }
 
@@ -1214,7 +1272,7 @@ class SimpleConsent {
 
     document.cookie = `${this.#config.cookieName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
 
-    this.#emit('update', this.#settings);
+    this.#emit('settings.update', this.#settings);
 
     if (typeof this.#config.onUpdateAfter == 'function') 
       this.#config.onUpdateAfter(this.#settings);
