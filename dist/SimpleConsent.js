@@ -27,6 +27,21 @@ class SimpleConsent {
     'showSettings',
   ];  
 
+  /**
+   * The main configuation object for the consent manager.
+   * The bulk of the functionality is driven by this object.
+   * 
+   * This object is resolved through a fair bit of recursion and object merging. Any custom config will be merged with this object.
+   * 
+   * The most specific config will always take precedence over the default config. This includes multi-configuration objects where the user's geolocation matches N+1 configurations.
+   * This config is written to be "safe" by design. If a user provides an invalid value, the library will default to the safest value (e.g. the most restrictive in terms of privacy).
+   * 
+   * Multi-configuration is supported by passing an object with a `_default` key and a `_router` key and any number of custom keys for each configuration.
+   * The library will detect if a multi-config object is passed and resolve the appropriate config based on the user's geolocation (if a `geoLocate` function is provided).
+   * 
+   * @private
+   * @type {Object}
+   */
   #config = {
 
     /**
@@ -131,13 +146,13 @@ class SimpleConsent {
      * @property {Object} l10n.<locale> - The translations for a specific locale.
      * @property {Array<Object>} l10n.<locale>.services - An array of localized service objects.
      * @property {Array<Object>} l10n.<locale>.types - An array of localized type objects.
-     * @property {Object} l10n.<locale>.text - An object containing localized UI text.
+     * @property {Object} l10n.<locale>.text - An object containing localized UI content.
      * 
      * @example
      * {
      *   fr: {
      *     services: [],
-     *     text: {},
+     *     content: {},
      *     types: [],
      *   },
      * }
@@ -159,19 +174,11 @@ class SimpleConsent {
      */
     locale: null,
 
-
-    geoLocate: null,
-
     /**
-     * Geo Location
-     * 
-     * The location of the user. This is used to determine the user's country code for regional compliance needs.
-     * This value can be set manually or automatically detected based on the user's IP address.
-     * 
-     * Value should be an ISO 3166-1 alpha-2 country code (e.g., 'US', 'GB', 'DE', etc...), 
-     * or a combination of ISO 3166-1 alpha-2 + a regional code (e.g., 'US-CA', 'GB-ENG', 'DE-BY', etc...).
+     * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
+     * @default null
      */
-    geoLocation: null,
+    geoLocate: null,
 
     /** 
      * Callback: onInit
@@ -251,6 +258,7 @@ class SimpleConsent {
                   </div>
                   <div class="consent-banner__description" id="consentBannerDescription">{{ description }}</div>
                   <div data-consent-actions></div>
+                  <div data-consent-links class="consent-ui__footer"></div>
                 </div>
               </div>
               `,
@@ -267,6 +275,7 @@ class SimpleConsent {
                     </div>
                     <div data-consent-actions></div>
                   </form>
+                  <div data-consent-links class="consent-ui__footer"></div>
                 </div>
               </div>
               `,
@@ -285,39 +294,50 @@ class SimpleConsent {
     },
 
     /**
-     * Text
+     * Content
      * 
-     * This object contains the default text content used in various parts of the consent manager UI.
+     * This object contains the default content used in various parts of the consent manager UI.
      * It includes text for the banner, modal, and URLs for privacy-related documents.
      * 
-     * @property {Object} text - The text object.
-     * @property {Object} text.banner - The text content for the consent banner.
-     * @property {string} text.banner.heading - The heading text for the banner.
-     * @property {string} text.banner.description - The description text for the banner.
-     * @property {Object} text.banner.actions - The action buttons text for the banner.
-     * @property {string} text.banner.actions.acceptAll - The text for the "Accept All" button.
-     * @property {string} text.banner.actions.denyAll - The text for the "Decline All" button.
-     * @property {string} text.banner.actions.showSettings - The text for the "Edit Settings" button.
+     * @property {Object} content - The text object.
+     * @property {Object} content.banner - The text content for the consent banner.
+     * @property {string} content.banner.heading - The heading text for the banner.
+     * @property {string} content.banner.description - The description text for the banner.
+     * @property {Object} content.banner.actions - The action buttons text for the banner.
+     * @property {string} content.banner.actions.acceptAll - The text for the "Accept All" button.
+     * @property {string} content.banner.actions.denyAll - The text for the "Decline All" button.
+     * @property {string} content.banner.actions.showSettings - The text for the "Edit Settings" button.
      * 
-     * @property {Object} text.modal - The text content for the consent modal.
-     * @property {string} text.modal.heading - The heading text for the modal.
-     * @property {string} text.modal.description - The description text for the modal.
-     * @property {string} text.modal.toggleAll - The text for the "Enable/Disable All" toggle.
-     * @property {Object} text.modal.actions - The action buttons text for the modal.
-     * @property {string} text.modal.actions.acceptAll - The text for the "Accept All" button.
-     * @property {string} text.modal.actions.acceptSelected - The text for the "Accept Selected" button.
-     * @property {string} text.modal.actions.denyAll - The text for the "Decline All" button.
-     * @property {string} text.modal.actions.save - The text for the "Save" button.
+     * @property {Object} content.modal - The text content for the consent modal.
+     * @property {string} content.modal.heading - The heading text for the modal.
+     * @property {string} content.modal.description - The description text for the modal.
+     * @property {string} content.modal.toggleAll - The text for the "Enable/Disable All" toggle.
+     * @property {Object} content.modal.actions - The action buttons text for the modal.
+     * @property {string} content.modal.actions.acceptAll - The text for the "Accept All" button.
+     * @property {string} content.modal.actions.acceptSelected - The text for the "Accept Selected" button.
+     * @property {string} content.modal.actions.denyAll - The text for the "Decline All" button.
+     * @property {string} content.modal.actions.save - The text for the "Save" button.
      * 
-     * @property {Object} text.urls - The URLs for privacy-related documents.
-     * @property {string} text.urls.privacyPolicy - The URL for the privacy policy.
-     * @property {string} text.urls.termsOfService - The URL for the terms of service.
-     * @property {string} text.urls.cookiePolicy - The URL for the cookie policy.
+     * @property {Object} content.urls - The URLs for privacy-related documents.
+     * @property {string} content.urls.privacyPolicy - The URL for the privacy policy.
+     * @property {string} content.urls.termsOfService - The URL for the terms of service.
+     * @property {string} content.urls.cookiePolicy - The URL for the cookie policy.
      */
-    text: {
+    content: {
+      links: {
+        privacyPolicy: {
+          text: 'Privacy Policy',
+          url: '#/privacy-policy',
+        },
+        termsOfService: null,
+        cookiePolicy: {
+          text: 'Cookie Policy',
+          url: '#/cookie-policy',
+        },
+      },
       banner: {
         heading: 'Privacy Notice',
-        description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our traffic. Information is also shared about your use of our site with our advertising partners.',
+        description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our website usage. This information is also shared with some of our advertising partners throught the use of tracking pixels.',
         actions: {
           acceptAll: 'Accept All',
           denyAll: 'Decline All',
@@ -377,7 +397,8 @@ class SimpleConsent {
    * Settings
    * 
    * Holds the consent settings for the consent manager.
-   * It is initialized to `null` and will be populated with the user's consent preferences once known.
+   * The settings object is a key-value pair where the key is the consent type and the value is a boolean indicating whether the user has consented.
+   * Any keys starting with an underscore (_) are reserved for internal use (e.g., _gpc for Global Privacy Control or _geo for geolocation etc...).
    * 
    * @private
    * @type {Object|null}
@@ -463,14 +484,61 @@ class SimpleConsent {
 
   }
 
-  static manager(config) {
+  get #name() {
+    return this.constructor.name;
+  }
 
-    if (!SimpleConsent.#instance) 
-      SimpleConsent.#instance = new SimpleConsent(config);
+  async #resolveConfig(config) {
     
-    return SimpleConsent.#instance;
+    if (config._default) {
+
+      this.#_multiConfig = config;
+      config = config._default;
+
+      this.#config = this.#deepMerge(this.#config, config);
+
+      let router = this.#_multiConfig._router;
+
+      if (! router)
+        console.warn('SimpleConsent: No `_router` found in multi-config object. Will default to base config.');
+
+      if (this.#config.geoLocate && typeof this.#config.geoLocate == 'function') {
+
+        this.#config.geoLocate().then((geo) => {
+
+          this.#_geo = geo;
+
+          if (! router) {
+            this.#init();
+            return;
+          }
+
+          router.forEach((route) => {
+            
+            if (! route.geoMatch)
+              return;
+
+            if (geo.match(route.geoMatch) && this.#_multiConfig.hasOwnProperty(route.config))
+              this.#config = this.#deepMerge(this.#config, this.#_multiConfig[route.config]);
+
+          });
+
+          this.#init();
+
+        });
+
+      }
+
+    } else {
+      this.#config = this.#deepMerge(this.#config, config);
+      this.#init();
+    }
 
   }
+
+  /* -------------
+   * Private API
+   * ------------- */
 
   #addAttributes(element, attributes) {
     for (const key in attributes) {
@@ -485,7 +553,7 @@ class SimpleConsent {
 
       const actions = e.detail.querySelectorAll('[data-consent-action]');
 
-      if (! this.#settings) {
+      if (! this.#settings._datetime) {
 
         actions.forEach((action) => {
           action.style.display = (action.getAttribute('data-consent-action') !== 'saveSettings') ? 'block' : 'none';
@@ -505,7 +573,7 @@ class SimpleConsent {
 
     document.addEventListener(`${this.#_namespace}:modal.close.before`, (e) => {
 
-      if (! this.#settings)
+      if (! this.#settings._datetime)
         this.show('banner');
 
     });
@@ -613,7 +681,7 @@ class SimpleConsent {
 
   }
 
-  #buildConsentStatusObject() {
+  #convertSettingsToStatusObject() {
 
     let obj = {};
       
@@ -670,18 +738,41 @@ class SimpleConsent {
     return target;
   }
 
-  get #name() {
-    return this.constructor.name;
+  #emit(eventName, detail) {
+    const event = new CustomEvent(`${this.#_namespace}:${eventName}`, { detail });
+    document.dispatchEvent(event);
   }
 
-  #determineDefaultSettings() {
+  #getServicesGroupedByType() {
+
+    const services = {};
+
+    for (let service of this.#config.services) {
+      for (let type of service.types) {
+        if (! services[type]) {
+          services[type] = [];
+        }
+        services[type].push(service);
+      }
+    }
+
+    return services;
+
+  }
+
+  #hideAll() {
+    this.hide('modal');
+    this.hide('banner');
+  }
+
+  #loadSettings() {
       
     this.#settings = this.settings;
-
+    
     // If we have settings, we don't need to do anything else.
-    if (this.#settings)
+    if (this.#settings) 
       return;
-
+    
     this.#settings = {};
 
     this.#config.consentModel = this.#config.consentModel.toLowerCase().trim();
@@ -713,33 +804,18 @@ class SimpleConsent {
 
   }
 
-  #emit(eventName, detail) {
-    const event = new CustomEvent(`${this.#_namespace}:${eventName}`, { detail });
-    document.dispatchEvent(event);
-  }
-
-  #getServicesGroupedByType() {
-
-    const services = {};
-
-    for (let service of this.#config.services) {
-      for (let type of service.types) {
-        if (! services[type]) {
-          services[type] = [];
-        }
-        services[type].push(service);
-      }
-    }
-
-    return services;
-
-  }
-
-  #hideAll() {
-    this.hide('modal');
-    this.hide('banner');
-  }
-
+  /**
+   * Responsible for:
+   * - Checking if a default locale is set in the config.
+   * - Extracting the current language code from the `<html>` "lang" attribute (if no explicit locale is set in the config).
+   * - Localizing the consent manager UI based on the locale and `l10n` config object (if defined).
+   * 
+   * If no localization possible given the above, the default text will be used.
+   * 
+   * @todo Implement localization for services and types.
+   * 
+   * @returns {void}
+   */
   #maybeLocalize() {
       
       if (! this.#config.l10n)
@@ -751,7 +827,7 @@ class SimpleConsent {
       }
 
       if (! this.#config.locale) {
-        console.info(`⚠️ ${this.#name}: No locale set or detected on html "lang" attribute. Using defaults.`);
+        console.info(`ℹ️ ${this.#name}: No locale set or detected on html "lang" attribute.`);
         return;
       }
 
@@ -760,12 +836,12 @@ class SimpleConsent {
       const l10n = this.#config.l10n[this.#config.locale];
   
       if (! l10n) {
-        console.info(`⚠️ ${this.#name}: No l10n key found for "${this.#config.locale}". Using defaults.`);
+        console.info(`ℹ️ ${this.#name}: No l10n key found for "${this.#config.locale}".`);
         return;
       }
   
-      if (l10n.text) 
-        this.#config.text = this.#deepMerge(this.#config.text, l10n.text);
+      if (l10n.content) 
+        this.#config.content = this.#deepMerge(this.#config.content, l10n.content);
   
       // if (l10n.services) {
       //   this.#config.services = l10n.services;
@@ -775,6 +851,12 @@ class SimpleConsent {
       //   this.#types = l10n.types;
   }
 
+  /**
+   * Reponsible for mounting the consent manager UI to the DOM.
+   * Calls sub-methods for mounting the modal, banner, and their appropriate actions.
+   * 
+   * @returns {void}
+   */
   #mount() {
 
     const root = document.createElement('div');
@@ -786,7 +868,7 @@ class SimpleConsent {
     });
 
     // Modal
-    this.#ui.modal = this.#parseTemplate('modal', this.#config.text.modal);
+    this.#ui.modal = this.#parseTemplate('modal', this.#config.content.modal);
     this.#addAttributes(this.#ui.modal, {
       'role': 'dialog',
     });
@@ -797,11 +879,8 @@ class SimpleConsent {
     root.appendChild(this.#ui.modal);
 
     // Banner
-    this.#ui.banner = this.#parseTemplate('banner', this.#config.text.banner);
+    this.#ui.banner = this.#parseTemplate('banner', this.#config.content.banner);
     this.#mountActions(this.#ui.banner);
-
-    if (! this.#settings && ! this.#config.forceConsent)
-      this.#ui.banner.classList.add('is-open');
     
     this.#addAttributes(this.#ui.banner, { 
       'data-consent-placement': this.#config.theme.placement.banner.join(','),
@@ -809,12 +888,15 @@ class SimpleConsent {
 
     root.appendChild(this.#ui.banner);
 
+    this.#mountLinks(root);
+
     // Root
     document.body.appendChild(root);
     this.#ui.root = root;
 
-    if (! this.#settings && this.#config.forceConsent)
-      this.show();
+    // Show the appropriate UI based on config + the state of the users settings.
+    // e.g. if the user has already set their preferences, we don't need to show the banner.
+    this.#showOnMount();
 
   }
 
@@ -822,36 +904,65 @@ class SimpleConsent {
       
     const template = element.dataset.consentTpl;
     const actions = this.#config.actions[template];
-
-    // console.log(`${template} Actions =>`, this.#config.text);
-
     const target = element.querySelector('[data-consent-actions]');
 
     if (! target) {
-      console.warn(`${this.#name}: Template Error - "${template}" does not contain a [data-consent-actions] target.`);
+      console.info(`ℹ️ ${this.#name}: Template Error - "${template}" does not contain a [data-consent-actions] target.`);
       return;
     }
 
     for (let prop of this.#config.actions[template]._order) {
-      if (!actions.hasOwnProperty(prop) || !actions[prop] || !this.#actions.includes(prop)) {
+      
+      if (!actions.hasOwnProperty(prop) || !actions[prop] || !this.#actions.includes(prop))
         continue;
-      }
   
       let action = document.createElement('button');
   
       if (this.#config.theme.actionClasses[prop]) {
-        if (this.#config.theme.actionClasses._all) {
+
+        if (this.#config.theme.actionClasses._all)
           action.classList.add(...this.#config.theme.actionClasses._all.split(' '));
-        }
+
         action.classList.add(...this.#config.theme.actionClasses[prop].split(' '));
+        
       }
   
       action.setAttribute('data-consent-action', prop);
-      action.textContent = this.#config.text[template].actions[prop];
+      action.textContent = this.#config.content[template].actions[prop];
   
       target.append(action);
     }
 
+  }
+
+  #mountLinks(element) {
+      
+    const links = this.#config.content.links;
+    const targets = element.querySelectorAll('[data-consent-links]');
+
+    if (!targets.length)
+      return;
+    
+    for (let target of targets) {
+      let linkCount = 0;
+      for (let link in links) {
+        if (!links.hasOwnProperty(link) || !links[link])
+          continue;
+    
+        if (linkCount > 0) {
+          let delimiter = document.createElement('span');
+          delimiter.setAttribute('data-consent-link-delimiter', '');
+          target.appendChild(delimiter);
+        }
+    
+        let a = document.createElement('a');
+        a.href = links[link].url;
+        a.textContent = links[link].text;
+    
+        target.appendChild(a);
+        linkCount++;
+      }
+    }
   }
 
   #mountConsentTypes() {
@@ -886,6 +997,14 @@ class SimpleConsent {
 
   }
 
+  /**
+   * Parses a template string from the config and replaces placeholders with content.
+   * 
+   * @param {string} template - The key of the template to parse from the `#config.templates` object.
+   * @param {Object} content - The content object to replace placeholders in the template.
+   * 
+   * @returns {HTMLElement} The parsed template as a DOM node.
+   */
   #parseTemplate(template, content = {}) {
 
     const tpl = document.createElement('template');
@@ -914,7 +1033,7 @@ class SimpleConsent {
 
   #pushToDataLayer(event) {
 
-    let payload = this.#buildConsentStatusObject();
+    let payload = this.#convertSettingsToStatusObject();
   
     payload.event = `${this.#_namespace}.${event}`;
     payload.consentModel = this.#config.consentModel;
@@ -923,59 +1042,11 @@ class SimpleConsent {
 
   }
 
-  async #resolveConfig(config) {
-    
-    if (config._default) {
-
-      this.#_multiConfig = config;
-      config = config._default;
-
-      this.#config = this.#deepMerge(this.#config, config);
-
-      let router = this.#_multiConfig._router;
-
-      if (! router)
-        console.warn('SimpleConsent: No `_router` found in multi-config object. Will default to base config.');
-
-      if (this.#config.geoLocate && typeof this.#config.geoLocate == 'function') {
-
-        this.#config.geoLocate().then((geo) => {
-
-          this.#_geo = geo;
-
-          if (! router) {
-            this.#init();
-            return;
-          }
-
-          router.forEach((route) => {
-            
-            if (! route.geoMatch)
-              return;
-
-            if (geo.match(route.geoMatch) && this.#_multiConfig.hasOwnProperty(route.config))
-              this.#config = this.#deepMerge(this.#config, this.#_multiConfig[route.config]);
-
-          });
-
-          this.#init();
-
-        });
-
-      }
-
-    } else {
-      this.#config = this.#deepMerge(this.#config, config);
-      this.#init();
-    }
-
-  }
-
   #init() {
 
     this.#config.cookieDomain = this.#resolveCookieDomain();
 
-    this.#determineDefaultSettings();
+    this.#loadSettings();
 
     this.#bindCustomEvents();
     this.#bindExplicitActions();
@@ -1011,47 +1082,37 @@ class SimpleConsent {
     return rootDomain;
   }
 
-  #resetSettings() {
-    document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
-    this.#settings = null;
+  #showOnMount() {
 
-    this.#determineDefaultSettings();
+    const forceConsent = this.#config.forceConsent;
+    const hasStoredSettings = this.#settings._datetime;
 
+    if (hasStoredSettings)
+      return;
+
+    if (! forceConsent) {
+      this.show('banner');
+    } else {
+      this.show('modal');
+    }
+
+  }
+  
+  /* -------------
+   * Public API
+   * ------------- */
+
+  static manager(config) {
+
+    if (!SimpleConsent.#instance) 
+      SimpleConsent.#instance = new SimpleConsent(config);
     
+    return SimpleConsent.#instance;
+
   }
 
-  accept() {
-    this.changeAll();
-    this.save();
-  }
-
-  changeAll(value = true) {
-    this.#ui.settings.forEach((input) => {
-      if (!input.disabled)
-        input.checked = value;
-    });
-  }
-
-  deny() {
-    this.changeAll(false);
-    this.save();
-  }
-
-
-
-  reset() {
-    
-    document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
-    this.#settings = null;
-
-    this.#determineDefaultSettings();
-    this.#bindImplicitActions();
-
-    // @bug - this needs adjusted to read the default settings and update the UI accordingly. 
-    // It won't always be as simple as just setting the defaults based on the consentModel.
-    this.changeAll((this.#config.consentModel === 'opt-in') ? false : true);
-    this.show((this.#config.forceConsent) ? 'modal' : 'banner');
-
+  get config() {
+    return this.#config;
   }
 
   get settings() {
@@ -1079,12 +1140,45 @@ class SimpleConsent {
 
   }
 
+  accept() {
+    this.changeAll();
+    this.save();
+  }
+
+  changeAll(value = true) {
+    this.#ui.settings.forEach((input) => {
+      if (!input.disabled)
+        input.checked = value;
+    });
+  }
+
+  deny() {
+    this.changeAll(false);
+    this.save();
+  }
+
   hide(uiKey = 'modal') {
 
     if (this.#config.forceConsent && ! this.#settings)
       return;
 
     this.#ui[uiKey].classList.remove('is-open');
+
+  }
+
+  reset() {
+    
+    document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+    this.#settings = null;
+
+    this.#loadSettings();
+    this.#bindImplicitActions();
+
+    // @bug - this needs adjusted to read the default settings and update the UI accordingly. 
+    // It won't always be as simple as just setting the defaults based on the consentModel.
+    this.changeAll((this.#config.consentModel === 'opt-in') ? false : true);
+
+    this.#showOnMount();
 
   }
 
@@ -1135,10 +1229,6 @@ class SimpleConsent {
     this.#ui[uiKey].classList.add('is-open');
     this.#emit(`${uiKey}.show.after`, this.#ui[uiKey]);
 
-  }
-
-  get config() {
-    return this.#config;
   }
 
 }
