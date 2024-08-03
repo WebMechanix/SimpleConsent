@@ -1,17 +1,18 @@
 # SimpleConsent
 
 **⚠️ IN ACTIVE DEVELOPMENT - DO NOT USE IN PRODUCTION**
+
 A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 SimpleConsent is an ultra-lightweight, configuration-first, consent management library for web sites/applications.
 
-- **⚡️ Lightweight** - < 10KB minified and gzipped (JS + CSS) - compared to 50KB+ for most CMPs.
+- **⚡️ Lightweight** - &lt; 10KB minified and gzipped (JS + CSS) - compared to 50KB+ for most CMPs.
 - **⚙️ Configuration First** - If you can write basic JSON objects, you can configure SimpleConsent.
 - **🏷️ Google Tag Manager (GTM) Focused** - Designed to work with GTM's consent signal APIs.
 
 **Foreword**
 
-A large portion of this project is/was inspired by [Klaro](https://duckduckgo.com). Klaro is a great project, and does a LOT more than this library, and offer a premium hosted service. But, Klaro takes a "Services first" approach to its configuration instead of "consent types" - this makes Klaro a little hard to use with tools like GTM and more specifically its consent signal APIs are "type/behavior" focused.
+A large portion of this project is/was inspired by [Klaro](https://klaro.org). Klaro is a great project, and does a LOT more than this library, and offer a premium hosted service. But, Klaro takes a "Services first" approach to its configuration instead of "consent types" - this makes Klaro a little hard to use with tools like GTM and more specifically its consent signal APIs are "type/behavior" focused.
 
 **⚠️ LEGAL DISCLAIMER!** 
 
