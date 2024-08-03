@@ -1,18 +1,18 @@
-# SimpleConsent (⚠️ IN ACTIVE DEVELOPMENT)
+# SimpleConsent
 
-**A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.**
+**⚠️ This project is in active development.** A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 SimpleConsent is an ultra-lightweight, configuration-first, consent management library for web sites/applications.
 
 - **⚡️ Lightweight** - &lt; 10KB minified and gzipped (JS + CSS) - compared to 50KB+ for most CMPs.
-- **⚙️ Configuration First** - If you can write basic JSON objects, you can configure SimpleConsent.
+- **⚙️ Configuration First** - If you can write basic JSON objects, you can configure SimpleConsent. If you can write some basic CSS, you can style it. If you use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates if you wish. 
 - **🏷️ Google Tag Manager (GTM) Focused** - Designed to work with GTM's consent signal APIs.
 
-**Foreword**
+### Foreword
 
-A large portion of this project is/was inspired by [Klaro](https://klaro.org). Klaro is a great project, and does a LOT more than this library, and offer a premium hosted service. But, Klaro takes a "Services first" approach to its configuration instead of "consent types" - this makes Klaro a little hard to use with tools like GTM and more specifically its consent signal APIs are "type/behavior" focused.
+A large portion of this project is/was inspired by [Klaro](https://klaro.org). Klaro is a great project, and does a LOT more than this library, and offer a premium hosted service. But, Klaro takes a "Services first" approach to its configuration instead of "consent types" - this makes Klaro a little hard to use with tools like GTM and more specifically its consent signal APIs that are "type/behavior" focused.
 
-**⚠️ LEGAL DISCLAIMER!** 
+### ⚠️ LEGAL DISCLAIMER!
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**. 
 
