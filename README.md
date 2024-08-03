@@ -1,8 +1,6 @@
-# SimpleConsent
+# SimpleConsent (⚠️ IN ACTIVE DEVELOPMENT)
 
-**⚠️ IN ACTIVE DEVELOPMENT - DO NOT USE IN PRODUCTION**
-
-A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
+**A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.**
 
 SimpleConsent is an ultra-lightweight, configuration-first, consent management library for web sites/applications.
 
@@ -35,7 +33,7 @@ Every configuration/implementation will not require robust multi-language suppor
 Sensible defaults set via CSS variables, overrideable templates if full control is desired.
 
 #### Minimal Build Tooling
-Value simplictiy, no TypeScript (for now) or elaborate build tooling (aside from basic minification/compression). 
+Value simplicity, no TypeScript (for now) or elaborate build tooling (aside from basic minification/compression). 
 
 ---
 
@@ -64,6 +62,10 @@ You can do this by adding the following code to your website's `<head>`.
 Inside the `consentConfig.js` (or whatever you chose for a filename) file, you will need to define a global object called `consentConfig` (or whatever you chose for global object) that will be used to configure the consent manager behavior. This configuration object is merged with the default configuration object provided by the library allowing you to override any default settings. 
 
 ```javascript
+/** 
+ * ℹ️ SimpleConsent will clean up the global scope after initialization, 
+ * As such, this object will not be available to other scripts on your page.
+ */
 window.consentConfig = window.consentConfig || {
   consentModel: 'opt-out',
   content: {
@@ -77,4 +79,16 @@ window.consentConfig = window.consentConfig || {
 
 The above example will display a banner with the title "🍪 Notice" and use an "opt-out" consent model (meaning the default consent types are all enabled until the user disables them).
 
-This object is removed from the global scope after the library has loaded, so it will not be available to other scripts on your page.
+You can view the source of the default `#config` object in the SimpleConsent class. Each configration object is annotated with JSDoc comments to help you understand what each property does.
+
+#### Sample GTM Container Configuration
+
+@todo
+
+Proper configuration of this tool with Google Tag Manager does require some triggers and consent default/update tags to be configured. As a result, a sample GTM container configuration is provided in the `gtm` directory of this repository. This configuration assumes the use of the 7 main consent types provided by the library. If you have customized your consent types, you will need to create triggers to match the consent types you have defined.
+
+#### Contributing
+
+@todo
+
+If you would like to contribute to this project, please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
