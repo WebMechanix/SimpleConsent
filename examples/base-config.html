@@ -27,7 +27,7 @@ dataLayer.push({
 // })(window,document,'script','dataLayer','GTM-PTLD5H79');
 </script>
 
-<link rel="shortcut icon" href="#" type="image/x-icon">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍪</text></svg>">
 <link rel="preconnect" href="https://fonts.bunny.net">
 
 <!-- Styles -->
@@ -38,8 +38,7 @@ dataLayer.push({
 
 <link rel="stylesheet" href="assets/example.css">
 
-<link href="../dist/SimpleConsent.css" rel="stylesheet">
-
+<link href="../dist/SimpleConsent.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <!-- Scripts -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="assets/example.js"></script>
@@ -47,14 +46,15 @@ dataLayer.push({
 <!-- <script defer src="consentMultiConfig.js"></script> -->
 <script>
 window.consentConfig = {
-  consentModel: 'opt-in',
+  consentModel: 'opt-out',
+  // consentRequired: true,
   content: {
     banner: {
-      heading: '🍪 & Privacy <b>Notice</b>',
+      heading: '🍪 & Privacy Notice',
       // description: 'We use cookies to provide the best experience. By clicking "Accept", you agree to the use of cookies.',
       actions: {
-        acceptAll: 'Accept',
-        denyAll: 'Deny',
+        // acceptAll: 'Accept',
+        // denyAll: 'Deny',
       },
     },
     modal: {
@@ -68,34 +68,183 @@ window.consentConfig = {
   },
   gtm: { loadContainer: true, containerId: 'GTM-PTLD5H79' },
   l10n: {
+    de: {
+      content: {
+        banner: {
+          heading: 'Datenschutzhinweis',
+          description: 'Diese Website verwendet Cookies (oder andere Browser-Speichermöglichkeiten), um unsere Dienste bereitzustellen und/oder die Nutzung unserer Website zu analysieren. Diese Informationen werden auch durch die Verwendung von Tracking-Skripten/Pixeln mit Werbepartnern geteilt.',
+          actions: {
+            acceptAll: 'Alle akzeptieren',
+            denyAll: 'Alle ablehnen',
+            showSettings: 'Einstellungen bearbeiten'
+          }
+        },
+        notices: {
+          required: {
+            badge: 'Immer aktiviert'
+          },
+          gpc: {
+            badge: 'Durch GPC deaktiviert',
+            heading: 'Globale Datenschutzkontrolle (GPC)',
+            description: 'Einige Dienste wurden deaktiviert, um Ihr Opt-out-Signal zu respektieren.'
+          }
+        },
+        modal: {
+          heading: 'Ihre Datenschutzoptionen',
+          description: 'Diese Website verwendet Dienste, die Speicherfunktionen in Ihrem Browser (über Cookies oder andere Browser-Speicherfunktionen) nutzen, um Informationen zu sammeln. Sie können bestimmte Arten der Datenerfassung mit den folgenden Steuerungsmöglichkeiten genehmigen oder ablehnen.',
+          toggleAll: 'Alle aktivieren/deaktivieren',
+          actions: {
+            acceptAll: 'Alle akzeptieren',
+            acceptSelected: 'Ausgewählte akzeptieren',
+            denyAll: 'Alle ablehnen',
+            saveSettings: 'Einstellungen speichern'
+          }
+        },
+        links: {
+          privacyPolicy: {
+            text: 'Datenschutzrichtlinie',
+            url: '#/privacy-policy'
+          },
+          termsOfService: null,
+          cookiePolicy: {
+            text: 'Cookie-Richtlinie',
+            url: '#/cookie-policy'
+          }
+        }
+      }
+    },
+    el: {
+      content: {
+        banner: {
+          heading: 'Ειδοποίηση Απορρήτου',
+          description: 'Αυτός ο ιστότοπος χρησιμοποιεί cookies (ή άλλη αποθήκευση του προγράμματος περιήγησης) για την παροχή των υπηρεσιών μας ή/και την ανάλυση της χρήσης του ιστοτόπου μας. Αυτές οι πληροφορίες μοιράζονται επίσης με διαφημιστικούς συνεργάτες μέσω της χρήσης σεναρίων/pixels παρακολούθησης.',
+          actions: {
+            acceptAll: 'Αποδοχή Όλων',
+            denyAll: 'Απόρριψη Όλων',
+            showSettings: 'Επεξεργασία Προτιμήσεων'
+          }
+        },
+        notices: {
+          required: {
+            badge: 'Πάντα Ενεργοποιημένο'
+          },
+          gpc: {
+            badge: 'Απενεργοποιημένο από το GPC',
+            heading: 'Παγκόσμιος Έλεγχος Απορρήτου (GPC)',
+            description: 'Ορισμένες υπηρεσίες έχουν απενεργοποιηθεί για να σεβαστούν το σήμα εξαίρεσής σας.'
+          }
+        },
+        modal: {
+          heading: 'Οι Επιλογές Απορρήτου σας',
+          description: 'Αυτός ο ιστότοπος χρησιμοποιεί υπηρεσίες που αξιοποιούν λειτουργίες αποθήκευσης στο πρόγραμμα περιήγησής σας (μέσω cookies ή άλλων λειτουργιών αποθήκευσης του προγράμματος περιήγησης) για τη συλλογή πληροφοριών. Μπορείτε να επιλέξετε να επιτρέψετε ή να απορρίψετε ορισμένους τύπους συλλογής δεδομένων χρησιμοποιώντας τα παρακάτω στοιχεία ελέγχου.',
+          toggleAll: 'Ενεργοποίηση/Απενεργοποίηση Όλων',
+          actions: {
+            acceptAll: 'Αποδοχή Όλων',
+            acceptSelected: 'Αποδοχή Επιλεγμένων',
+            denyAll: 'Απόρριψη Όλων',
+            saveSettings: 'Αποθήκευση Προτιμήσεων'
+          }
+        },
+        links: {
+          privacyPolicy: {
+            text: 'Πολιτική Απορρήτου',
+            url: '#/privacy-policy'
+          },
+          termsOfService: null,
+          cookiePolicy: {
+            text: 'Πολιτική Cookies',
+            url: '#/cookie-policy'
+          }
+        }
+      }
+    },
+    es: {
+      content: {
+        banner: {
+          heading: 'Aviso de privacidad',
+          description: 'Este sitio web utiliza cookies (u otro almacenamiento del navegador) para ofrecer nuestros servicios y/o analizar el uso de nuestro sitio web. Esta información también se comparte con socios publicitarios mediante el uso de scripts/píxeles de seguimiento.',
+          actions: {
+            acceptAll: 'Aceptar todo',
+            denyAll: 'Rechazar todo',
+            showSettings: 'Editar preferencias'
+          }
+        },
+        notices: {
+          required: {
+            badge: 'Siempre activado'
+          },
+          gpc: {
+            badge: 'Desactivado por GPC',
+            heading: 'Control de Privacidad Global (GPC)',
+            description: 'Algunos servicios han sido desactivados para respetar su señal de exclusión.'
+          }
+        },
+        modal: {
+          heading: 'Sus opciones de privacidad',
+          description: 'Este sitio web utiliza servicios que emplean funciones de almacenamiento en su navegador (a través de cookies u otras funcionalidades de almacenamiento del navegador) para recopilar información. Puede elegir conceder o denegar ciertos tipos de recopilación de datos utilizando los controles a continuación.',
+          toggleAll: 'Activar/Desactivar todo',
+          actions: {
+            acceptAll: 'Aceptar todo',
+            acceptSelected: 'Aceptar seleccionados',
+            denyAll: 'Rechazar todo',
+            saveSettings: 'Guardar preferencias'
+          }
+        },
+        links: {
+          privacyPolicy: {
+            text: 'Política de privacidad',
+            url: '#/privacy-policy'
+          },
+          termsOfService: null,
+          cookiePolicy: {
+            text: 'Política de cookies',
+            url: '#/cookie-policy'
+          }
+        }
+      }
+    },
     fr: {
       content: {
         banner: {
-          heading: '🍪 & Confidentialité',
-          description: 'Nous utilisons des cookies pour offrir la meilleure expérience. En cliquant sur "Accepter", vous acceptez l\'utilisation des cookies.',
+          heading: 'Avis de confidentialité',
+          description: 'Ce site web utilise des cookies (ou d\'autres moyens de stockage du navigateur) pour fournir nos services et/ou analyser l\'utilisation de notre site web. Ces informations sont également partagées avec des partenaires publicitaires par l\'utilisation de scripts/pixels de suivi.',
           actions: {
-            showSettings: 'Préférences',
-            acceptAll: 'Accepter',
-            denyAll: 'Refuser',
+            acceptAll: 'Tout accepter',
+            denyAll: 'Tout refuser',
+            showSettings: 'Modifier les préférences'
+          }
+        },
+        notices: {
+          required: {
+            badge: 'Toujours activé'
           },
+          gpc: {
+            badge: 'Désactivé par GPC',
+            heading: 'Contrôle global de la confidentialité (GPC)',
+            description: 'Certains services ont été désactivés pour respecter votre signal de refus.'
+          }
         },
         modal: {
-          heading: 'Préférences de confidentialité',
-          description: 'Ceci est un aperçu des cookies que nous utilisons. Vous pouvez choisir les cookies que vous souhaitez accepter.',
+          heading: 'Vos choix de confidentialité',
+          description: 'Ce site web utilise des services qui emploient des fonctionnalités de stockage dans votre navigateur (via des cookies ou d\'autres fonctionnalités de stockage du navigateur) pour collecter des informations. Vous pouvez choisir d\'autoriser ou de refuser certains types de collecte de données en utilisant les contrôles ci-dessous.',
+          toggleAll: 'Tout activer/désactiver',
           actions: {
             acceptAll: 'Tout accepter',
             acceptSelected: 'Accepter la sélection',
-            saveSettings: 'Sauvegarder',
             denyAll: 'Tout refuser',
-          },
+            saveSettings: 'Enregistrer les préférences'
+          }
         },
         links: {
           privacyPolicy: {
             text: 'Politique de confidentialité',
+            url: '#/privacy-policy'
           },
+          termsOfService: null,
           cookiePolicy: {
-            text: 'Politique de cookies',
-          },
+            text: 'Politique des cookies',
+            url: '#/cookie-policy'
+          }
         }
       },
       services: {},
@@ -125,6 +274,96 @@ window.consentConfig = {
           description: 'Active le stockage et les services liés à la sécurité tels que la fonctionnalité d\'authentification, la prévention de la fraude et d\'autres protections des utilisateurs.'
         }
       },
+    },
+    ja: {
+      content: {
+        banner: {
+          heading: 'プライバシー通知',
+          description: 'このウェブサイトは、サービスの提供やウェブサイトの利用状況を分析するためにクッキー（または他のブラウザストレージ）を使用しています。この情報は、トラッキングスクリプト/ピクセルの使用を通じて広告パートナーとも共有されます。',
+          actions: {
+            acceptAll: 'すべて受け入れる',
+            denyAll: 'すべて拒否する',
+            showSettings: '設定を編集する'
+          }
+        },
+        notices: {
+          required: {
+            badge: '常に有効'
+          },
+          gpc: {
+            badge: 'GPCにより無効化',
+            heading: 'グローバルプライバシーコントロール（GPC）',
+            description: 'オプトアウト信号を尊重するため、一部のサービスが無効化されています。'
+          }
+        },
+        modal: {
+          heading: 'プライバシー選択',
+          description: 'このウェブサイトは、情報を収集するためにブラウザのストレージ機能（クッキーまたは他のブラウザストレージ機能）を利用するサービスを使用しています。以下のコントロールを使用して、特定のタイプのデータ収集を許可または拒否することができます。',
+          toggleAll: 'すべて有効/無効',
+          actions: {
+            acceptAll: 'すべて受け入れる',
+            acceptSelected: '選択したものを受け入れる',
+            denyAll: 'すべて拒否する',
+            saveSettings: '設定を保存する'
+          }
+        },
+        links: {
+          privacyPolicy: {
+            text: 'プライバシーポリシー',
+            url: '#/privacy-policy'
+          },
+          termsOfService: null,
+          cookiePolicy: {
+            text: 'クッキーポリシー',
+            url: '#/cookie-policy'
+          }
+        }
+      }
+    },
+    zh: {
+      content: {
+        banner: {
+          heading: '隐私声明',
+          description: '本网站使用cookie（或其他浏览器存储）来提供我们的服务和/或分析我们的网站使用情况。这些信息也通过使用跟踪脚本/像素与广告合作伙伴共享。',
+          actions: {
+            acceptAll: '接受所有',
+            denyAll: '拒绝所有',
+            showSettings: '编辑偏好设置'
+          }
+        },
+        notices: {
+          required: {
+            badge: '始终启用'
+          },
+          gpc: {
+            badge: '已被GPC禁用',
+            heading: '全球隐私控制（GPC）',
+            description: '为尊重您的选择退出信号，某些服务已被禁用。'
+          }
+        },
+        modal: {
+          heading: '您的隐私选择',
+          description: '本网站使用的服务利用您浏览器中的存储功能（通过cookie或其他浏览器存储功能）来收集信息。您可以使用以下控件选择授予或拒绝某些类型的数据收集。',
+          toggleAll: '启用/禁用所有',
+          actions: {
+            acceptAll: '接受所有',
+            acceptSelected: '接受所选',
+            denyAll: '拒绝所有',
+            saveSettings: '保存偏好设置'
+          }
+        },
+        links: {
+          privacyPolicy: {
+            text: '隐私政策',
+            url: '#/privacy-policy'
+          },
+          termsOfService: null,
+          cookiePolicy: {
+            text: 'Cookie政策',
+            url: '#/cookie-policy'
+          }
+        }
+      }
     }
   },
   services: {
@@ -209,6 +448,7 @@ window.consentConfig = {
     }
   },
   ui: {
+    // showBranding: false,
     actionClasses: {
       // _all: 'btn btn-sm',
       // acceptAll: 'btn-primary',
