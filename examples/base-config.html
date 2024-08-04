@@ -31,10 +31,13 @@ dataLayer.push({
 <link rel="preconnect" href="https://fonts.bunny.net">
 
 <!-- Styles -->
-<link rel="stylesheet" href="https://fonts.bunny.net/css?family=fira-code:400,500|saira:400,400i,500,500i,600,600i,700,700i">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+<link rel="stylesheet" can-disable href="https://fonts.bunny.net/css?family=fira-code:400,500|saira:400,400i,500,500i,600,600i,700,700i">
+<link rel="stylesheet" can-disable href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" can-disable href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <link rel="stylesheet" href="assets/example.css">
+
 <link href="../dist/SimpleConsent.css" rel="stylesheet">
 
 <!-- Scripts -->
@@ -95,9 +98,7 @@ window.consentConfig = {
           },
         }
       },
-      services: {
-        
-      },
+      services: {},
       types: {
         necessary: {
           name: 'Nécessaire',
@@ -127,20 +128,60 @@ window.consentConfig = {
     }
   },
   services: {
+    cloudflare: {
+      name: 'Cloudflare',
+      description: '',
+      types: ['necessary', 'security_storage'],
+    },
     google_analytics: {
       name: 'Google Analytics',
       description: '',
-      types: ['analytics_storage', 'ad_personalization'],
+      types: ['analytics_storage', 'advertising'],
+    },
+    google_ads: {
+      name: 'Google Ads',
+      description: '',
+      types: ['advertising'],
+    },
+    hotjar: {
+      name: 'Hotjar',
+      description: '',
+      types: ['analytics_storage'],
     },
     hubspot: {
       name: 'HubSpot',
       description: '',
       types: ['analytics_storage', 'personalization_storage'],
     },
-    google_ads: {
-      name: 'Google Ads',
+    linkedin_ads: {
+      name: 'LinkedIn Ads',
       description: '',
       types: ['advertising'],
+    },
+    meta_ads: {
+      name: 'Meta Ads',
+      description: '',
+      types: ['advertising'],
+    },
+    microsoft_ads: {
+      name: 'Microsoft Ads',
+      description: '',
+      types: ['advertising'],
+    },
+    microsoft_clarity: {
+      name: 'Microsoft Clarity',
+      description: '',
+      types: ['analytics_storage'],
+    },
+    tiktok_ads: {
+      name: 'TikTok Ads',
+      description: '',
+      types: ['advertising'],
+    },
+    vwo: {
+      name: 'Visual Website Optimizer',
+      description: '',
+      types: ['analytics_storage'],
     },
   },
   types: {
@@ -169,12 +210,12 @@ window.consentConfig = {
   },
   ui: {
     actionClasses: {
-      _all: 'btn btn-sm',
-      acceptAll: 'btn-primary',
-      acceptSelected: 'btn-primary',
-      denyAll: 'btn-secondary',
-      showSettings: 'btn-link px-0',
-      saveSettings: 'btn-primary',
+      // _all: 'btn btn-sm',
+      // acceptAll: 'btn-primary',
+      // acceptSelected: 'btn-primary',
+      // denyAll: 'btn-secondary',
+      // showSettings: 'btn-link px-0',
+      // saveSettings: 'btn-primary',
     }
   },
 };
@@ -217,8 +258,8 @@ window.consentConfig = {
 
     </div>
 
-    <div class="small text-center text-muted mt-5">
-      <a href="#" data-consent-action="showSettings">Consent Preferences</a>
+    <div class="d-flex align-items-center justify-content-center gap-2 text-center text-muted mt-4">
+      <button class="btn btn-link btn-sm p-0" data-consent-action="showSettings">Consent Preferences</button> / <button class="btn btn-link btn-sm p-0" data-toggle-stylesheets>Disable Stylesheets</button>
     </div>
   </div>
 </body>

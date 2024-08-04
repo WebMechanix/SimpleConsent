@@ -10,11 +10,19 @@ class SimpleConsent {
 
   static #instance = null;
 
+  #_geo = null;
   #_multiConfig = null;
   #_namespace = 'simple-consent';
   #_version = 1.0;
-  #_geo = null;
   
+  /**
+   * A list of actions that are available to the user through the use of buttons added to the consent UI.
+   * This list is used as a failsafe to prevent the user from calling methods that are not available,
+   * and to prevent the configuration from adding new actions that are not supported by the library.
+   * 
+   * @private
+   * @type {Array<string>}
+   */
   #actions = [
     'acceptAll',
     'acceptSelected',
@@ -22,7 +30,7 @@ class SimpleConsent {
     'denyAll',
     'saveSettings',
     'showSettings',
-  ];  
+  ];
 
   /**
    * The main configuation object for the consent manager.
@@ -174,13 +182,22 @@ class SimpleConsent {
     cookieExpiryDays: 365,          
 
     /**
-     * Cookie Name
+     * The method used to store the user's consent settings.
      * 
-     * The name of the cookie that stores the user's consent settings.
+     * When set to 'cookie', the consent settings will be stored in a cookie only.
+     * When set to 'localstorage', the consent settings will be stored in local storage only.
+     * When set to 'hybrid', the consent settings will be stored in both a cookie and local storage.
+     * 
+     * @value {string} 'cookie'|'localstorage'|'hybrid'
+     */
+    storageMethod: 'hybrid',
+
+    /**
+     * The name used for the name of the cookie and/or localstorage key that stores the user's consent settings.
      * 
      * @default string 'simple_consent'
      */
-    cookieName: 'simple_consent',   
+    storageName: 'simple_consent',   
 
     /**
      * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
@@ -394,6 +411,15 @@ class SimpleConsent {
    */
   #settings = null;
 
+  /**
+   * Holds the types of consent that are available to the user in the settings modal.
+   * This object sets a default type of "necessary" which every implementation should have.
+   * 
+   * This object can be extended via the user provided config using its `types` property.
+   * 
+   * @private
+   * @type {Object}
+   */
   #types = {
     necessary: {
       key: 'necessary',
@@ -425,22 +451,91 @@ class SimpleConsent {
 
   constructor(config) {
 
-    console.time(`⏱️ ${this.#name}`);
+    console.time(`⏱️ ${this.#class}`);
 
     if (SimpleConsent.#instance) 
       return SimpleConsent.#instance;
 
     SimpleConsent.#instance = this;
 
-    this.#resolveConfig(config);
+    try {
+      this.#resolveConfig(config);
+    } catch (error) {
+      console.error(`${this.#class}: Config resolution error:`, error);
+    }
 
-    console.timeEnd(`⏱️ ${this.#name}`);
+    console.timeEnd(`⏱️ ${this.#class}`);
 
   }
 
-  get #name() {
+  get #class() {
     return this.constructor.name;
   }
+
+  get #servicesByType() {
+
+    const services = {};
+    
+    for (let [serviceKey, service] of Object.entries(this.#config.services)) {
+
+      for (let type of service.types) {
+        
+        if (! services[type])
+          services[type] = [];
+        
+        services[type].push(service);
+
+      }
+      
+    }
+
+    return services;
+
+  }
+
+  get config() {
+    return this.#config;
+  }
+
+  get storage() {
+
+    if (this.#settings) 
+      return this.#settings;
+
+    if (['localstorage', 'hybrid'].includes(this.#config.storageMethod)) {
+
+      let settings = localStorage.getItem(this.#config.storageName);
+
+      if (settings) {
+        this.#settings = JSON.parse(settings);
+        return this.#settings;
+      }
+
+    }
+    
+    if (['cookie', 'hybrid'].includes(this.#config.storageMethod)) {
+
+      let name = `${this.#config.storageName}=`;
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+
+      for (let i = 0; i <ca.length; i++) {
+
+        let c = ca[i];
+
+        while (c.charAt(0) == ' ')
+          c = c.substring(1);
+        
+        if (c.indexOf(name) == 0) 
+          return JSON.parse(c.substring(name.length, c.length));
+        
+      }
+
+    }
+      
+    return null;
+
+  } 
 
   async #resolveConfig(config) {
     
@@ -454,7 +549,7 @@ class SimpleConsent {
       let router = this.#_multiConfig._router;
 
       if (! router)
-        console.warn('SimpleConsent: No `_router` found in multi-config object. Will default to base config.');
+        console.warn(`${this.#class}: No "_router" found in multi-config object. Will default to base config.`);
 
       if (this.#config.geoLocate && typeof this.#config.geoLocate == 'function') {
 
@@ -519,13 +614,6 @@ class SimpleConsent {
    * Private API
    * ------------- */
 
-  #addAttributes(element, attributes) {
-    for (const key in attributes) {
-      if (! attributes.hasOwnProperty(key)) continue;
-      element.setAttribute(key, attributes[key]);
-    }
-  }
-
   #bindCustomEvents() {
 
     document.addEventListener(`${this.#_namespace}:modal.show.before`, (e) => {
@@ -562,7 +650,6 @@ class SimpleConsent {
     });
 
     document.addEventListener(`${this.#_namespace}:settings.load`, (e) => {
-      console.log(e.type, e.detail);
       this.#gtmPush('default');
     });
 
@@ -661,6 +748,17 @@ class SimpleConsent {
 
   }
 
+  #boolToStatus(bool) {
+    return bool ? 'granted' : 'denied';
+  }
+
+  #bulkSetAttributes(element, attributes) {
+    for (const key in attributes) {
+      if (! attributes.hasOwnProperty(key)) continue;
+      element.setAttribute(key, attributes[key]);
+    }
+  }
+
   #convertSettingsToStatusObject() {
 
     let obj = {};
@@ -716,6 +814,10 @@ class SimpleConsent {
       }
     }
     return target;
+  }
+
+  #getType(key) {
+    return this.#types[key] || false;
   }
 
   #gtmSetDataLayer() {
@@ -778,8 +880,6 @@ class SimpleConsent {
     document.dispatchEvent(event);
   }
 
-  
-
   #hideAll() {
     this.hide('modal');
     this.hide('banner');
@@ -787,7 +887,7 @@ class SimpleConsent {
 
   #loadSettings() {
       
-    this.#settings = this.settings;
+    this.#settings = this.storage;
     
     // If we have settings, we don't need to do anything else.
     if (this.#settings) {
@@ -801,7 +901,7 @@ class SimpleConsent {
 
     // Saftey net for invalid consentModel values
     if (! ['opt-in', 'opt-out'].includes(this.#config.consentModel)) {
-      console.info(`⚠️ ${this.#name}: Invalid consentModel config value "${this.#config.consentModel}". Defaulting to "opt-in".`);
+      console.info(`⚠️ ${this.#class}: Invalid consentModel config value "${this.#config.consentModel}". Defaulting to "opt-in".`);
       this.#config.consentModel = 'opt-in';
     }
 
@@ -815,9 +915,9 @@ class SimpleConsent {
     if (navigator.globalPrivacyControl) {
       defaultSetting = navigator.globalPrivacyControl ? false : defaultSetting;
       this.#settings['_gpc'] = navigator.globalPrivacyControl;
-      console.info(`ℹ️ ${this.#name}: GPC signal detected, setting applicable types to "denied" (false) =>`, this.#settings);
+      console.info(`ℹ️ ${this.#class}: GPC signal detected, setting applicable types to "denied" (false)`, this.#settings);
     } else {
-      console.info(`ℹ️ ${this.#name}: Settings determined by "${this.#config.consentModel}" consentModel (${defaultSetting}) =>`, this.#settings);
+      console.info(`ℹ️ ${this.#class}: Settings determined by "${this.#config.consentModel}" consentModel`, this.#settings);
     }
 
     for (let [typeKey, type] of Object.entries(this.#types)) {
@@ -851,7 +951,7 @@ class SimpleConsent {
       }
 
       if (! this.#config.locale) {
-        console.info(`ℹ️ ${this.#name}: No locale set or detected on html "lang" attribute.`);
+        console.info(`ℹ️ ${this.#class}: No locale set or detected on html "lang" attribute.`);
         return;
       }
 
@@ -860,7 +960,7 @@ class SimpleConsent {
       const l10n = this.#config.l10n[this.#config.locale];
   
       if (! l10n) {
-        console.info(`ℹ️ ${this.#name}: No l10n key found for "${this.#config.locale}".`);
+        console.info(`ℹ️ ${this.#class}: No l10n key found for "${this.#config.locale}".`);
         return;
       }
   
@@ -886,13 +986,13 @@ class SimpleConsent {
     root.id = this.#config.ui.rootId;
     
     root.className = this.#config.ui.rootClass;
-    this.#addAttributes(root, { 
+    this.#bulkSetAttributes(root, { 
       'data-consent-tpl': 'root',
     });
 
     // Modal
     this.#ui.modal = this.#parseTemplate('modal', this.#config.content.modal);
-    this.#addAttributes(this.#ui.modal, {
+    this.#bulkSetAttributes(this.#ui.modal, {
       'role': 'dialog',
     });
 
@@ -905,7 +1005,7 @@ class SimpleConsent {
     this.#ui.banner = this.#parseTemplate('banner', this.#config.content.banner);
     this.#mountActions(this.#ui.banner);
     
-    this.#addAttributes(this.#ui.banner, { 
+    this.#bulkSetAttributes(this.#ui.banner, { 
       'data-consent-placement': this.#config.ui.placement.banner.join(','),
     });
 
@@ -930,7 +1030,7 @@ class SimpleConsent {
     const target = element.querySelector('[data-consent-actions]');
 
     if (! target) {
-      console.info(`ℹ️ ${this.#name}: Template Error - "${template}" does not contain a [data-consent-actions] target.`);
+      console.info(`ℹ️ ${this.#class}: Template Error - "${template}" does not contain a [data-consent-actions] target.`);
       return;
     }
 
@@ -1007,7 +1107,7 @@ class SimpleConsent {
 
       const tpl = this.#parseTemplate('type', type);
 
-      this.#addAttributes(tpl, { 
+      this.#bulkSetAttributes(tpl, { 
         'data-consent-type': typeKey
       });
 
@@ -1057,7 +1157,7 @@ class SimpleConsent {
 
     }
 
-    this.#addAttributes(tpl.content.firstChild, {
+    this.#bulkSetAttributes(tpl.content.firstChild, {
       'data-consent-tpl': template
     });
     
@@ -1085,42 +1185,23 @@ class SimpleConsent {
     return rootDomain;
   }
 
-  #escapeHTML(unsafeText) {
+  #safelyReplaceToken(tpl, token, content) {
+
+    let pattern = new RegExp(`{{ ${token} }}`, 'g');
+    let sanitized = content.replace(/<[^>]*>?/gm, '');
+    sanitized = this.#sanitizeHTML(sanitized);
+
+    return tpl.replace(pattern, sanitized);
+
+  }
+
+  #sanitizeHTML(unsafeText) {
     return unsafeText
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-  }
-
-  #safelyReplaceToken(tpl, token, content) {
-
-    let pattern = new RegExp(`{{ ${token} }}`, 'g');
-    let sanitized = content.replace(/<[^>]*>?/gm, '');
-    sanitized = this.#escapeHTML(sanitized);
-
-    return tpl.replace(pattern, sanitized);
-
-  }
-
-  get #servicesByType() {
-
-    const services = {};
-    
-    for (let [serviceKey, service] of Object.entries(this.#config.services)) {
-
-      for (let type of service.types) {
-        if (! services[type]) {
-          services[type] = [];
-        }
-        services[type].push(service);
-      }
-      
-    }
-
-    return services;
-
   }
 
   #showOnMount() {
@@ -1138,52 +1219,10 @@ class SimpleConsent {
     }
 
   }
-
-  #getType(key) {
-    return this.#types[key] || false;
-  }
   
   /* -------------
    * Public API
    * ------------- */
-
-  static manager(config) {
-
-    if (!SimpleConsent.#instance) 
-      SimpleConsent.#instance = new SimpleConsent(config);
-    
-    return SimpleConsent.#instance;
-
-  }
-
-  get config() {
-    return this.#config;
-  }
-
-  get settings() {
-
-    if (this.#settings) 
-      return this.#settings;
-
-    let name = `${this.#config.cookieName}=`;
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-
-    for (let i = 0; i <ca.length; i++) {
-
-      let c = ca[i];
-
-      while (c.charAt(0) == ' ')
-        c = c.substring(1);
-      
-      if (c.indexOf(name) == 0) 
-        return JSON.parse(c.substring(name.length, c.length));
-      
-    }
-    
-    return null;
-
-  }
 
   accept() {
     this.changeAll();
@@ -1213,7 +1252,7 @@ class SimpleConsent {
 
   reset() {
     
-    document.cookie = `${this.#config.cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+    document.cookie = `${this.#config.storageName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
     this.#settings = null;
 
     this.#loadSettings();
@@ -1225,10 +1264,6 @@ class SimpleConsent {
 
     this.#showOnMount();
 
-  }
-
-  #boolToStatus(bool) {
-    return bool ? 'granted' : 'denied';
   }
 
   save(implicit = false) {
@@ -1270,7 +1305,7 @@ class SimpleConsent {
       this.#settings[key] = value;
     });
 
-    document.cookie = `${this.#config.cookieName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
+    document.cookie = `${this.#config.storageName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
 
     this.#emit('settings.update', this.#settings);
 
@@ -1286,6 +1321,19 @@ class SimpleConsent {
     this.#emit(`${uiKey}.show.before`, this.#ui[uiKey]);
     this.#ui[uiKey].classList.add('is-open');
     this.#emit(`${uiKey}.show.after`, this.#ui[uiKey]);
+
+  }
+
+  /* -------------
+   * Static API
+   * ------------- */
+
+  static manager(config) {
+
+    if (!SimpleConsent.#instance) 
+      SimpleConsent.#instance = new SimpleConsent(config);
+    
+    return SimpleConsent.#instance;
 
   }
 

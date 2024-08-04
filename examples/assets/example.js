@@ -41,3 +41,20 @@ document.addEventListener('alpine:init', () => {
   });
 
 });
+
+document.addEventListener('click', (e) => {
+
+  if (! e.target.hasAttribute('data-toggle-stylesheets'))
+    return;
+
+  e.preventDefault();
+
+  e.target.innerText = e.target.innerText === 'Enable Stylesheets' ? 'Disable Stylesheets' : 'Enable Stylesheets';
+  document.body.classList.toggle('stylesheets-disabled');
+
+  const stylesheets = document.querySelectorAll('link[can-disable]');
+  stylesheets.forEach(stylesheet => {
+    stylesheet.disabled = ! stylesheet.disabled;
+  });
+
+});

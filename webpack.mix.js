@@ -9,9 +9,9 @@ mix.options({
         beautify: false,
         comments: /^\*!/,
       },
-      output: {
-        preserve_annotations: true
-      },
+      compress: {
+        drop_console: mix.inProduction(),
+      }
     },
   },
 });
@@ -20,17 +20,6 @@ mix.copy(`src/${library}.js`, `dist/${library}.js`)
   .copy(`src/${library}.css`, `dist/${library}.css`);
 
 if (mix.inProduction()) {
-
   mix.minify(`src/${library}.js`, `dist/${library}.min.js`)
-    .css(`src/${library}.css`, `dist/${library}.min.css`)
-    .options({
-      terser: {
-        terserOptions: {
-          compress: {
-            drop_console: true,
-        }
-        },
-      },
-    });
-
+    .css(`src/${library}.css`, `dist/${library}.min.css`);
 }
