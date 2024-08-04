@@ -26,6 +26,20 @@ If you...
 #### 🏷️ Google Tag Manager (GTM) Focused
 Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
+### SimpleConsent might be for you if...
+
+1. ✅ You use Google Tag Manager (GTM) for managing your tags
+2. ✅ You aren't afraid to write some basic JS/JSON and CSS
+3. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot (etc...)
+
+### SimpleConsent isn't for you if...
+
+1. ❌ You don't use a TMS like Google Tag Manager for controlling tag firing
+2. ❌ You need full-fledged "autoblocking" behavior
+3. ❌ You require IAB TCF v2.X compliance/compaitibility (for now - this may change in the future)
+4. ❌ You require support for dead browsers like Internet Explorer (we'll never do this don't ask)
+5. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
+
 ### ⚠️ Legal Disclaimer! ⚠️
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
