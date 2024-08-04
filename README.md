@@ -2,7 +2,13 @@
 
 **⚠️ This project is in active development.** A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
-SimpleConsent is an ultra-lightweight, configuration-first, consent management library for web sites/applications.
+#### Foreword
+
+A large portion of this project is/was inspired by [Klaro](https://github.com/klaro-org/klaro-js). Klaro is another great open-source consent project, and does a LOT more than this library - especially around "autoblocking" behavior. However, Klaro takes a "services first" approach to its configuration instead of "consent types". This makes Klaro a bit harder to use with GTM and more specifically its consent signal APIs that are "type/behavior" focused. So TL;DR - if this library doesn't fit your needs, check out Klaro - it very well could.
+
+### Why should I use this?
+
+SimpleConsent is a tool to help technical marketers and/or developers comply with the data-collection laws using a lightweight alternative to expensive 3rd party services like OneTrust or CookieBot. 
 
 #### ⚡️ Lightweight (< 10KB gzipped)
 [![JS GZip Size](https://img.badgesize.io/derekcavaliero/simpleconsent/main/dist/SimpleConsent.min.js?compression=gzip&label=JS%20GZip%20size)](https://github.com/derekcavaliero/simpleconsent/blob/main/dist/SimpleConsent.min.js)
@@ -12,41 +18,21 @@ Compare this to bloated CMPs like OneTrust or CookieBot which can be 100KB+ in s
 
 #### ⚙️ Configuration First
 If you... 
-- can write basic JSON objects, you can configure it 
-- can write some basic CSS, you can style it
-- use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates if desired
+- Can write basic JSON structures, you can configure it 
+- Can write some basic CSS, you can style it
+- Use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates
+- Have access to Cloudflare Workers, or Server-Side GTM, (or similar tech) you can create geolocation routing
 
 #### 🏷️ Google Tag Manager (GTM) Focused
 Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
-### Foreword
-
-A large portion of this project is/was inspired by [Klaro](https://klaro.org). Klaro is a great project, and does a LOT more than this library, and offer a premium hosted service. But, Klaro takes a "Services first" approach to its configuration instead of "consent types" - this makes Klaro a little hard to use with tools like GTM and more specifically its consent signal APIs that are "type/behavior" focused.
-
-### ⚠️ LEGAL DISCLAIMER!
+### ⚠️ Legal Disclaimer! ⚠️
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
 
-This library is a tool to help technical marketers and companies comply with the law using a lightweight alternative to something like OneTrust or CookieBot. As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager.
+As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
 
-**It cannot be understated to always (even if using a hosted CMP) to consult with a data privacy lawyer to ensure your consent banner configuration is compliant with regional data collection laws.**
-
-### Library Principles
-
-#### Developer/Technical Marketer First
-This is a "Configuration First" library. Too many CMPs try to offer fancy GUI's and tertiary features like "Cookie Scanners". YAGNI - and if you do - there's likely a better way than a hosted CMP. 
-
-#### Focused on Tag Managment through Google Tag Manager (GTM)
-Love it or hate it - GTM is the main TMS used on the web - used by millions of websites. This library will not try to tailor to every TMS or situation.
-
-#### Localization is Opt-In
-Every configuration/implementation will not require robust multi-language support. We want to keep the core library as small as possible. As such, localization will be "DIY" through provided configuration objects. With the abundance of AI tools like LLMs - localizing a configuration object should be easy to do.
-
-#### Easy to Style & Theme
-Sensible defaults set via CSS variables, overrideable templates if full control is desired.
-
-#### Minimal Build Tooling
-Value simplicity, no TypeScript (for now) or elaborate build tooling (aside from basic minification/compression). 
+**It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
 
 ---
 
@@ -101,7 +87,5 @@ You can view the source of the default `#config` object in the SimpleConsent cla
 Proper configuration of this tool with Google Tag Manager does require some triggers and consent default/update tags to be configured. As a result, a sample GTM container configuration is provided in the `gtm` directory of this repository. This configuration assumes the use of the 7 main consent types provided by the library. If you have customized your consent types, you will need to create triggers to match the consent types you have defined.
 
 #### Contributing
-
-@todo
 
 If you would like to contribute to this project, please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
