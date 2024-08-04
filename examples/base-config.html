@@ -27,7 +27,7 @@ dataLayer.push({
 // })(window,document,'script','dataLayer','GTM-PTLD5H79');
 </script>
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍪</text></svg>">
+<link rel="shortcut icon" href="#" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.bunny.net">
 
 <!-- Styles -->
@@ -38,7 +38,8 @@ dataLayer.push({
 
 <link rel="stylesheet" href="assets/example.css">
 
-<link href="../dist/SimpleConsent.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link href="../dist/SimpleConsent.css" rel="stylesheet">
+
 <!-- Scripts -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="assets/example.js"></script>
@@ -46,15 +47,14 @@ dataLayer.push({
 <!-- <script defer src="consentMultiConfig.js"></script> -->
 <script>
 window.consentConfig = {
-  consentModel: 'opt-out',
-  // consentRequired: true,
+  consentModel: 'opt-in',
   content: {
     banner: {
-      heading: '🍪 & Privacy Notice',
+      heading: '🍪 & Privacy <b>Notice</b>',
       // description: 'We use cookies to provide the best experience. By clicking "Accept", you agree to the use of cookies.',
       actions: {
-        // acceptAll: 'Accept',
-        // denyAll: 'Deny',
+        acceptAll: 'Accept',
+        denyAll: 'Deny',
       },
     },
     modal: {
@@ -161,45 +161,31 @@ window.consentConfig = {
     fr: {
       content: {
         banner: {
-          heading: 'Avis de confidentialité',
-          description: 'Ce site web utilise des cookies (ou d\'autres moyens de stockage du navigateur) pour fournir nos services et/ou analyser l\'utilisation de notre site web. Ces informations sont également partagées avec des partenaires publicitaires par l\'utilisation de scripts/pixels de suivi.',
+          heading: '🍪 & Confidentialité',
+          description: 'Nous utilisons des cookies pour offrir la meilleure expérience. En cliquant sur "Accepter", vous acceptez l\'utilisation des cookies.',
           actions: {
-            acceptAll: 'Tout accepter',
-            denyAll: 'Tout refuser',
-            showSettings: 'Modifier les préférences'
-          }
-        },
-        notices: {
-          required: {
-            badge: 'Toujours activé'
+            showSettings: 'Préférences',
+            acceptAll: 'Accepter',
+            denyAll: 'Refuser',
           },
-          gpc: {
-            badge: 'Désactivé par GPC',
-            heading: 'Contrôle global de la confidentialité (GPC)',
-            description: 'Certains services ont été désactivés pour respecter votre signal de refus.'
-          }
         },
         modal: {
-          heading: 'Vos choix de confidentialité',
-          description: 'Ce site web utilise des services qui emploient des fonctionnalités de stockage dans votre navigateur (via des cookies ou d\'autres fonctionnalités de stockage du navigateur) pour collecter des informations. Vous pouvez choisir d\'autoriser ou de refuser certains types de collecte de données en utilisant les contrôles ci-dessous.',
-          toggleAll: 'Tout activer/désactiver',
+          heading: 'Préférences de confidentialité',
+          description: 'Ceci est un aperçu des cookies que nous utilisons. Vous pouvez choisir les cookies que vous souhaitez accepter.',
           actions: {
             acceptAll: 'Tout accepter',
             acceptSelected: 'Accepter la sélection',
+            saveSettings: 'Sauvegarder',
             denyAll: 'Tout refuser',
-            saveSettings: 'Enregistrer les préférences'
-          }
+          },
         },
         links: {
           privacyPolicy: {
             text: 'Politique de confidentialité',
-            url: '#/privacy-policy'
           },
-          termsOfService: null,
           cookiePolicy: {
-            text: 'Politique des cookies',
-            url: '#/cookie-policy'
-          }
+            text: 'Politique de cookies',
+          },
         }
       },
       services: {},
@@ -229,52 +215,7 @@ window.consentConfig = {
           description: 'Active le stockage et les services liés à la sécurité tels que la fonctionnalité d\'authentification, la prévention de la fraude et d\'autres protections des utilisateurs.'
         }
       },
-    },
-    ja: {
-      content: {
-        banner: {
-          heading: 'プライバシー通知',
-          description: 'このウェブサイトは、サービスの提供やウェブサイトの利用状況を分析するためにクッキー（または他のブラウザストレージ）を使用しています。この情報は、トラッキングスクリプト/ピクセルの使用を通じて広告パートナーとも共有されます。',
-          actions: {
-            acceptAll: 'すべて受け入れる',
-            denyAll: 'すべて拒否する',
-            showSettings: '設定を編集する'
-          }
-        },
-        notices: {
-          required: {
-            badge: '常に有効'
-          },
-          gpc: {
-            badge: 'GPCにより無効化',
-            heading: 'グローバルプライバシーコントロール（GPC）',
-            description: 'オプトアウト信号を尊重するため、一部のサービスが無効化されています。'
-          }
-        },
-        modal: {
-          heading: 'プライバシー選択',
-          description: 'このウェブサイトは、情報を収集するためにブラウザのストレージ機能（クッキーまたは他のブラウザストレージ機能）を利用するサービスを使用しています。以下のコントロールを使用して、特定のタイプのデータ収集を許可または拒否することができます。',
-          toggleAll: 'すべて有効/無効',
-          actions: {
-            acceptAll: 'すべて受け入れる',
-            acceptSelected: '選択したものを受け入れる',
-            denyAll: 'すべて拒否する',
-            saveSettings: '設定を保存する'
-          }
-        },
-        links: {
-          privacyPolicy: {
-            text: 'プライバシーポリシー',
-            url: '#/privacy-policy'
-          },
-          termsOfService: null,
-          cookiePolicy: {
-            text: 'クッキーポリシー',
-            url: '#/cookie-policy'
-          }
-        }
-      }
-    },
+    }
   },
   services: {
     cloudflare: {
@@ -358,7 +299,6 @@ window.consentConfig = {
     }
   },
   ui: {
-    // showBranding: false,
     actionClasses: {
       // _all: 'btn btn-sm',
       // acceptAll: 'btn-primary',
