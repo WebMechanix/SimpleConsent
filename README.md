@@ -8,11 +8,16 @@ SimpleConsent is an ultra-lightweight, configuration-first, consent management l
 [![JS GZip Size](https://img.badgesize.io/derekcavaliero/simpleconsent/main/dist/SimpleConsent.min.js?compression=gzip&label=JS%20GZip%20size)](https://github.com/derekcavaliero/simpleconsent/blob/main/dist/SimpleConsent.min.js)
 [![CSS GZip Size](https://img.badgesize.io/derekcavaliero/simpleconsent/main/dist/SimpleConsent.min.css?compression=gzip&label=CSS%20GZip%20size)](https://github.com/derekcavaliero/simpleconsent/blob/main/dist/SimpleConsent.min.css)
 
+Compare this to bloated CMPs like OneTrust or CookieBot which can be 100KB+ in size AFTER GZip compression.
+
 #### ⚙️ Configuration First
-If you can write basic JSON objects, you can configure SimpleConsent. If you can write some basic CSS, you can style it. If you use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates if you wish. 
+If you... 
+- can write basic JSON objects, you can configure it 
+- can write some basic CSS, you can style it
+- use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates if desired
 
 #### 🏷️ Google Tag Manager (GTM) Focused
-Designed to work with GTM's consent signal APIs.
+Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
 ### Foreword
 
