@@ -135,18 +135,28 @@ class SimpleConsent {
         description: 'This website uses cookies (or other browser storage) to deliver our services and/or analyze our website usage. This information is also shared with advertising partners through the use of tracking scripts/pixels.',
         actions: {
           acceptAll: 'Accept All',
-          denyAll: 'Decline All',
-          showSettings: 'Edit Settings',
+          denyAll: 'Deny All',
+          showSettings: 'Edit Preferences',
+        },
+      },
+      notices: {
+        required: {
+          badge: 'Always Enabled',
+        },
+        gpc: {
+          badge: 'Disabled by GPC',
+          heading: 'Global Privacy Control (GPC)',
+          description: 'Some services have been disabled to respect your opt-out signal.',
         },
       },
       modal: {
-        heading: 'Consent & Privacy Settings',
+        heading: 'Your Privacy Choices',
         description: 'This website uses services that utilize storage features in your browser (via cookies or other browser storage functionality) to collect information. You can choose to grant or deny certain types of data collection using the controls below.',
         toggleAll: 'Enable/Disable All',
         actions: {
           acceptAll: 'Accept All',
           acceptSelected: 'Accept Selected',
-          denyAll: 'Decline All',
+          denyAll: 'Deny All',
           saveSettings: 'Save Preferences',
         },
       },
@@ -181,23 +191,7 @@ class SimpleConsent {
      */
     cookieExpiryDays: 365,          
 
-    /**
-     * The method used to store the user's consent settings.
-     * 
-     * When set to 'cookie', the consent settings will be stored in a cookie only.
-     * When set to 'localstorage', the consent settings will be stored in local storage only.
-     * When set to 'hybrid', the consent settings will be stored in both a cookie and local storage.
-     * 
-     * @value {string} 'cookie'|'localstorage'|'hybrid'
-     */
-    storageMethod: 'hybrid',
-
-    /**
-     * The name used for the name of the cookie and/or localstorage key that stores the user's consent settings.
-     * 
-     * @default string 'simple_consent'
-     */
-    storageName: 'simple_consent',   
+    
 
     /**
      * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
@@ -307,6 +301,24 @@ class SimpleConsent {
     services: {},
 
     /**
+     * The method used to store the user's consent settings.
+     * 
+     * When set to 'cookie', the consent settings will be stored in a cookie only.
+     * When set to 'localstorage', the consent settings will be stored in local storage only.
+     * When set to 'hybrid', the consent settings will be stored in both a cookie and local storage.
+     * 
+     * @value {string} 'cookie'|'localstorage'|'hybrid'
+     */
+    storageMethod: 'hybrid',
+
+    /**
+     * The name used for the name of the cookie and/or localstorage key that stores the user's consent settings.
+     * 
+     * @default string 'simple_consent'
+     */
+    storageName: 'simple_consent',   
+
+    /**
      * Templates
      * 
      * The templates object is used to store the HTML templates for the consent manager. 
@@ -331,6 +343,7 @@ class SimpleConsent {
                     <button aria-label="Close" data-consent-close></button>
                   </div>
                   <div class="consent-banner__description" id="consentBannerDescription">{{ description }}</div>
+                  <div data-consent-notices></div>
                   <div data-consent-actions></div>
                   <div data-consent-links class="consent-ui__footer"></div>
                 </div>
@@ -344,6 +357,7 @@ class SimpleConsent {
                     <button aria-label="Close" data-consent-close></button>
                   </div>
                   <div class="consent-modal__description" id="consentModalDescription">{{ description }}</div>
+                  <div data-consent-notices></div>
                   <form data-consent-settings>
                     <div data-consent-types class="consent-modal__body">
                     </div>
@@ -351,6 +365,12 @@ class SimpleConsent {
                   </form>
                   <div data-consent-links class="consent-ui__footer"></div>
                 </div>
+              </div>
+              `,
+      notice: `
+              <div>
+                <strong>{{ heading }}</strong>: 
+                {{ description }}
               </div>
               `,
       type:   `
@@ -657,9 +677,28 @@ class SimpleConsent {
 
   #bindExplicitActions() {
 
+    document.addEventListener('keyup', (e) => {
+      
+      if (e.key !== 'Escape') 
+        return;
+
+      if (this.#ui.modal && this.#ui.modal.classList.contains('is-open'))
+        this.#ui.modal.querySelector('[data-consent-close]').click();
+
+    });
+
     document.addEventListener('click', (e) => {
 
-      if (e.target.hasAttribute('data-consent-action')) {
+      /**
+       * @important!
+       * 
+       * Chrome (and possibly other browsers) wrap text in <font> when the native browser translation feature is used.
+       * When that happens - the target element is the <font> element and not the actual element that the user clicked #footgun
+       * So we always scope the target to the closest element with the data-consent-action attribute.
+       */
+      let actionTarget = e.target.closest('[data-consent-action]');
+
+      if (actionTarget) {
         
         e.preventDefault();
 
@@ -669,7 +708,9 @@ class SimpleConsent {
           acceptSelected: 'save',
           denyAll: 'deny',
           saveSettings: 'save',
-        }[e.target.dataset.consentAction]]();
+        }[actionTarget.dataset.consentAction]]();
+
+        return;
         
       }        
 
@@ -1011,6 +1052,19 @@ class SimpleConsent {
 
     root.appendChild(this.#ui.banner);
 
+    if (this.#settings._gpc) {
+      let targets = root.querySelectorAll('[data-consent-notices]');
+
+      for (let target of targets) {
+        let notice = this.#parseTemplate('notice', this.#config.content.notices.gpc);
+        this.#bulkSetAttributes(notice, { 
+          'data-consent-tpl': 'notice',
+          'data-consent-notice': 'info',
+        });
+        target.appendChild(notice);
+      }
+    }
+
     this.#mountLinks(root);
 
     // Root
@@ -1058,41 +1112,6 @@ class SimpleConsent {
 
   }
 
-  #mountLinks(element) {
-      
-    const links = this.#config.content.links;
-    const targets = element.querySelectorAll('[data-consent-links]');
-
-    if (!targets.length)
-      return;
-    
-    for (let target of targets) {
-      
-      let linkCount = 0;
-
-      for (let link in links) {
-
-        if (!links.hasOwnProperty(link) || !links[link])
-          continue;
-    
-        if (linkCount > 0) {
-          let delimiter = document.createElement('span');
-          delimiter.setAttribute('data-consent-link-delimiter', '');
-          target.appendChild(delimiter);
-        }
-    
-        let a = document.createElement('a');
-        a.href = links[link].url;
-        a.textContent = links[link].text;
-    
-        target.appendChild(a);
-        
-        linkCount++;
-
-      }
-    }
-  }
-
   #mountConsentTypes() {
 
     const services = this.#servicesByType;
@@ -1126,6 +1145,50 @@ class SimpleConsent {
 
     this.#ui.settings = this.#ui.modal.querySelectorAll('[data-consent-settings] input');
 
+  }
+
+  #mountLinks(element) {
+      
+    const links = this.#config.content.links;
+    const targets = element.querySelectorAll('[data-consent-links]');
+
+    if (!targets.length)
+      return;
+    
+    for (let target of targets) {
+      
+      let linkCount = 0;
+
+      for (let link in links) {
+
+        if (!links.hasOwnProperty(link) || !links[link])
+          continue;
+    
+        if (linkCount > 0) {
+          let delimiter = document.createElement('span');
+          delimiter.setAttribute('data-consent-link-delimiter', '');
+          target.appendChild(delimiter);
+        }
+    
+        let a = document.createElement('a');
+        a.href = links[link].url;
+        a.textContent = links[link].text;
+    
+        target.appendChild(a);
+        
+        linkCount++;
+
+      }
+
+      if (target.closest('[data-consent-tpl="modal"]') && this.#config.ui.showBranding) {
+        let a = document.createElement('a');
+        a.setAttribute('data-consent-branding', '');
+        a.href = 'https://github.com/derekcavaliero/simpleconsent/';
+        a.textContent = `Powered by ${this.#class}`;
+        target.appendChild(a);
+      }
+
+    }
   }
 
   /**
@@ -1219,6 +1282,14 @@ class SimpleConsent {
     }
 
   }
+
+  #store(data) {
+    if (['cookie', 'hybrid'].includes(this.#config.storageMethod))
+      document.cookie = `${this.#config.storageName}=${JSON.stringify(data)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
+
+    if (['cookie', 'hybrid'].includes(this.#config.storageMethod))
+      localStorage.setItem(this.#config.storageName, JSON.stringify(data));
+  }
   
   /* -------------
    * Public API
@@ -1305,7 +1376,7 @@ class SimpleConsent {
       this.#settings[key] = value;
     });
 
-    document.cookie = `${this.#config.storageName}=${JSON.stringify(this.#settings)}; expires=${new Date(Date.now() + (this.#config.cookieExpiryDays * 24 * 60 * 60 * 1000)).toUTCString()}; path=/; domain=${this.#config.cookieDomain}`;
+    this.#store(this.#settings);
 
     this.#emit('settings.update', this.#settings);
 
