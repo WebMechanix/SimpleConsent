@@ -267,7 +267,7 @@
 }
 
 .consent-banner__heading{
-  font-size: var(--consent-banner-heading-font-size);
+  font-size: var(--consent-banner-heading-font-size) !important;
   font-family: var(--consent-heading-font-family);
   font-weight: var(--consent-heading-font-weight);
   margin: 0;
@@ -317,7 +317,7 @@
 }
 
 .consent-modal__heading{
-  font-size: var(--consent-modal-heading-font-size);
+  font-size: var(--consent-modal-heading-font-size) !important;
   font-weight: var(--consent-heading-font-weight);
   margin: 0;
 }
@@ -417,7 +417,7 @@
 
   :root{
     --consent-font-size: 0.9rem;
-    --consent-modal-heading-font-size: 1.75rem;
+    --consent-modal-heading-font-size: clamp(1.5rem, 4vw, 1.75rem);
     --consent-padding-base: 1.5rem;
   }
 
