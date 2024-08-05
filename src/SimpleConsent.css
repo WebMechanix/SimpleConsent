@@ -364,7 +364,7 @@
   background-color: var(--consent-color-secondary);
   background-repeat: no-repeat;
   background-size: contain;
-  border-radius: 9999px;
+  border-radius: 9999px !important;
   transition: color 0.2s ease-in-out, background-position 0.2s ease-in-out;
   height: 1.5rem;
   width: 2.75rem;
