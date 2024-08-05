@@ -2,6 +2,16 @@
 
 **⚠️ This project is in active development.** A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
+### ⚠️ Legal Disclaimer! ⚠️
+
+**The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
+
+As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
+
+**It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
+
+---
+
 #### Foreword
 
 This project is/was inspired by [Klaro](https://github.com/klaro-org/klaro-js). Klaro is another great open-source consent project, and does a LOT more than this library - especially around "autoblocking" behavior. However, Klaro takes a "services first" approach to its configuration instead of "consent types". This makes Klaro a bit harder to use with GTM and more specifically its consent signal APIs that are "type/behavior" focused. So TL;DR - if this library doesn't fit your needs, check out Klaro - it very well could.
@@ -40,14 +50,6 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 4. ❌ You require support for dead browsers like Internet Explorer (we'll never do this don't ask)
 5. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
-### ⚠️ Legal Disclaimer! ⚠️
-
-**The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
-
-As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
-
-**It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
-
 ---
 
 ### Getting Started
@@ -63,11 +65,11 @@ In order to use SimpleConsent, 2 things are required. If you have used Klaro bef
 You can do this by adding the following code to your website's `<head>`.
 
 ```html
-<link href="/path/to/SimpleConsent.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/derekcavaliero/simpleconsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
 <script defer src="/path/to/consentConfig.js"></script>
 <script defer
   data-consent-config="consentConfig"
-  src="/path/to/SimpleConsent.min.js"></script>
+  src="https://cdn.jsdelivr.net/gh/derekcavaliero/simpleconsent@latest/dist/SimpleConsent.min.js"></script>
 ```
 
 #### Configuration
