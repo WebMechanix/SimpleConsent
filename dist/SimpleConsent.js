@@ -145,8 +145,7 @@ class SimpleConsent {
         },
         gpc: {
           badge: 'Disabled by GPC',
-          heading: 'Global Privacy Control (GPC)',
-          description: 'Some services have been disabled to respect your opt-out signal.',
+          description: 'Some services have been automatically disabled to respect your Global Privacy Control opt-out signal.',
         },
       },
       modal: {
@@ -369,7 +368,6 @@ class SimpleConsent {
               `,
       notice: `
               <div>
-                <strong>{{ heading }}</strong>: 
                 {{ description }}
               </div>
               `,
@@ -430,6 +428,16 @@ class SimpleConsent {
    * @type {Object|null}
    */
   #settings = null;
+
+  /**
+   * Stores references to the global privacy signals set by the user's browser.
+   * 
+   * @private
+   */
+  #signals = {
+    gpc: navigator.globalPrivacyControl || false,
+    dnt: navigator.doNotTrack || false,
+  };
 
   /**
    * Holds the types of consent that are available to the user in the settings modal.
@@ -515,6 +523,10 @@ class SimpleConsent {
 
   get config() {
     return this.#config;
+  }
+
+  get signals() {
+    return this.#signals;
   }
 
   get storage() {
@@ -953,9 +965,8 @@ class SimpleConsent {
 
     // Respect the user's Global Privacy Control setting
     // @todo - make sure that we can fine-tune by type if desired.
-    if (navigator.globalPrivacyControl) {
-      defaultSetting = navigator.globalPrivacyControl ? false : defaultSetting;
-      this.#settings['_gpc'] = navigator.globalPrivacyControl;
+    if (this.#signals.gpc) {
+      defaultSetting = this.#signals.gpc ? false : defaultSetting;
       console.info(`ℹ️ ${this.#class}: GPC signal detected, setting applicable types to "denied" (false)`, this.#settings);
     } else {
       console.info(`ℹ️ ${this.#class}: Settings determined by "${this.#config.consentModel}" consentModel`, this.#settings);
@@ -1052,7 +1063,7 @@ class SimpleConsent {
 
     root.appendChild(this.#ui.banner);
 
-    if (this.#settings._gpc) {
+    if (this.#signals.gpc) {
       let targets = root.querySelectorAll('[data-consent-notices]');
 
       for (let target of targets) {
@@ -1137,6 +1148,11 @@ class SimpleConsent {
       if (type.required) {
         input.disabled = true;
         input.checked = true;
+      }
+
+      if (this.#signals.gpc && type.gpc) {
+        input.disabled = true;
+        input.checked = false;
       }
 
       this.#ui.modal.querySelector('[data-consent-types]').appendChild(tpl);
@@ -1369,8 +1385,9 @@ class SimpleConsent {
     Object.entries({
       _datetime: new Date().toISOString(),
       _id: crypto.randomUUID(),
-      _model: `${this.#config.consentModel}/` + (implicit ? 'implicit' : 'explicit'),
       _geo: this.#_geo,
+      _gpc: this.#signals.gpc,
+      _model: `${this.#config.consentModel}/` + (implicit ? 'implicit' : 'explicit'),
       _version: this.#_version,
     }).forEach(([key, value]) => {
       this.#settings[key] = value;

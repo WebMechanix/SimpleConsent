@@ -175,6 +175,10 @@
   display: none;
 }
 
+[data-consent-notices]:not(:empty) + [data-consent-settings] [data-consent-types]{
+  border-top: 0;
+}
+
 [data-consent-tpl="notice"] {
   border: 1px solid transparent;
   border-width: 1px 0;

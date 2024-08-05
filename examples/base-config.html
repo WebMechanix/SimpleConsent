@@ -278,11 +278,13 @@ window.consentConfig = {
     analytics_storage: {
       name: 'Analytics & Performance',
       description: 'Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).',
+      gpc: true,
     },
     advertising: {
       name: 'Advertising Targeting & Measurement',
       description: 'Enables services and services for all advertising purposes. This includes, ad personalization, advertising cookies, user data shared with our advertising partners.',
       mapTo : ['ad_storage', 'ad_personalization', 'ad_user_data'],
+      gpc: true,
     },
     personalization_storage: {
       name: 'Personalization Storage',
