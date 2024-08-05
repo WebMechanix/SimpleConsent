@@ -1,7 +1,5 @@
 # SimpleConsent
 
-**⚠️ This project is in active development.** A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
-
 ### ⚠️ Legal Disclaimer! ⚠️
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
@@ -11,6 +9,10 @@ As such, installing this tool on your website does not "magically" make you comp
 **It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
 
 ---
+
+**⚠️ This project is in active development ⚠️** 
+
+A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 #### Foreword
 
