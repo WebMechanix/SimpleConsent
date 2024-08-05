@@ -198,11 +198,10 @@ class SimpleConsent {
 
     /**
      * Used to configure settings specific to Google Tag Manager.
-     * Things like the dataLayer object, container ID, etc..
      */
     gtm: {
-      loadContainer: false,
       containerId: null,
+      loadContainer: false,
     },
     
     /**
@@ -1103,14 +1102,12 @@ class SimpleConsent {
         continue;
   
       let action = document.createElement('button');
+
+      if (this.#config.ui.actionClasses._all)
+        action.classList.add(...this.#config.ui.actionClasses._all.split(' '));
   
       if (this.#config.ui.actionClasses[prop]) {
-
-        if (this.#config.ui.actionClasses._all)
-          action.classList.add(...this.#config.ui.actionClasses._all.split(' '));
-
         action.classList.add(...this.#config.ui.actionClasses[prop].split(' '));
-        
       }
   
       action.setAttribute('data-consent-action', prop);
