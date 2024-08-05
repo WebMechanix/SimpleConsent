@@ -139,13 +139,15 @@ class SimpleConsent {
           showSettings: 'Edit Preferences',
         },
       },
-      notices: {
-        required: {
-          badge: 'Always Enabled',
+      links: {
+        privacyPolicy: {
+          text: 'Privacy Policy',
+          url: '#/privacy-policy',
         },
-        gpc: {
-          badge: 'Disabled by GPC',
-          description: 'Some services have been automatically disabled to respect your Global Privacy Control opt-out signal.',
+        termsOfService: null,
+        cookiePolicy: {
+          text: 'Cookie Policy',
+          url: '#/cookie-policy',
         },
       },
       modal: {
@@ -159,15 +161,13 @@ class SimpleConsent {
           saveSettings: 'Save Preferences',
         },
       },
-      links: {
-        privacyPolicy: {
-          text: 'Privacy Policy',
-          url: '#/privacy-policy',
+      notices: {
+        required: {
+          badge: 'Always Enabled',
         },
-        termsOfService: null,
-        cookiePolicy: {
-          text: 'Cookie Policy',
-          url: '#/cookie-policy',
+        gpc: {
+          badge: 'Disabled by GPC',
+          description: 'Some services have been automatically disabled to respect your Global Privacy Control opt-out signal.',
         },
       },
     },
@@ -1148,6 +1148,7 @@ class SimpleConsent {
       if (this.#signals.gpc && type.gpc) {
         input.disabled = true;
         input.checked = false;
+        input.title = this.#config.content.notices.gpc.description;
       }
 
       this.#ui.modal.querySelector('[data-consent-types]').appendChild(tpl);
