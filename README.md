@@ -10,8 +10,7 @@ As such, installing this tool on your website does not "magically" make you comp
 
 ---
 
-**⚠️ This project is in active development ⚠️** 
-
+#### **⚠️ This project is in active development ⚠️** 
 A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 #### Foreword
