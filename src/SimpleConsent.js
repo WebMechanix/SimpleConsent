@@ -190,8 +190,6 @@ class SimpleConsent {
      */
     cookieExpiryDays: 365,          
 
-    
-
     /**
      * @value {Function} geoLocate - A function that returns a promise that resolves to the user's geolocation.
      * @default null
@@ -219,16 +217,16 @@ class SimpleConsent {
      * 
      * @property {Object} l10n - The localization object.
      * @property {Object} l10n.<locale> - The translations for a specific locale.
-     * @property {Array<Object>} l10n.<locale>.services - An array of localized service objects.
-     * @property {Array<Object>} l10n.<locale>.types - An array of localized type objects.
-     * @property {Object} l10n.<locale>.text - An object containing localized UI content.
+     * @property {Object} l10n.<locale>.services - An object of localized service objects.
+     * @property {Object} l10n.<locale>.types - An object of localized type objects.
+     * @property {Object} l10n.<locale>.content - An object containing localized UI content.
      * 
      * @example
      * {
      *   fr: {
-     *     services: [],
      *     content: {},
-     *     types: [],
+     *     services: {},
+     *     types: {},
      *   },
      * }
      * 
