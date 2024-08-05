@@ -1,5 +1,7 @@
 # SimpleConsent
 
+<img src="docs/images/ui-display.png" width=830 style="margin: 0 auto; display: block;" />
+
 ### ⚠️ Legal Disclaimer! ⚠️
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
