@@ -99,6 +99,47 @@ The above example will display a banner with the title "🍪 Notice" and use an 
 
 You can view the source of the default `#config` object in the SimpleConsent class. Each configration object is annotated with JSDoc comments to help you understand what each property does.
 
+### Defining Consent Types
+
+Consent types are the individual categories of data collection that your website performs. These can be anything from "Analytics" to "Marketing" or "Functional" data collection. Each consent type can have the following properties:
+
+- **`name`** (string) - The title of the consent type (what is show to the end user)
+- **`description`** (string) - A description of the consent type usually a brief explanation of what services/storage is used for the consent type.
+- **`required`** (boolean) - Whether or not the consent type is required for the website to function properly. Note, the library will automatically add a "necessary" type - you do not need to define one explicitly.
+- **`gpc`** (boolean) - If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected. This is useful for respecting the user's browser settings.\
+- **`mapTo`** (array) - If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
+
+```json
+"types": {
+  "analytics_storage": {
+    "name": "Analytics & Performance",
+    "description": "Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).",
+    "gpc": true,
+  },
+  "advertising": {
+    "name": "Advertising Targeting & Measurement",
+    "description": "Enables services and services for all advertising purposes. This includes, ad personalization, advertising cookies, user data shared with our advertising partners.",
+    "mapTo" : ["ad_storage", "ad_personalization", "ad_user_data"],
+    "gpc": true,
+  },
+  "personalization_storage": {
+    "name": "Personalization Storage",
+    "description": "Enables storage and services related to personalization e.g. video recommendations, and account preferences.",
+  },
+  "functionality_storage": {
+    "name": "Functional Storage",
+    "description": "Enables storage and services that supports the functionality of the website or app (e.g. language settings).",
+  },
+  "security_storage": {
+    "name": "Security Storage",
+    "description": "Enables storage and services related to security such as authentication functionality, fraud prevention, and other user protection.",
+    "required": true,
+  }
+}
+```
+
+Each consent type is defined with its own "key" (e.g. `analytics_storage`, `advertising`, etc...). These keys are used to reference the consent types in the configuration object. These are also the keys that are used when pushing `dataLayer` events to Google Tag Manager, and also the stored consent object in cookies and/or localStorage.
+
 #### Sample GTM Container Configuration
 
 @todo
