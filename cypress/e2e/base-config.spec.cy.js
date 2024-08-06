@@ -1,7 +1,7 @@
 describe('Base Config', () => {
 
   beforeEach(() => {
-    cy.visit('http://localhost:8080/examples/base-config.html')
+    cy.visit('http://localhost:8080/examples/test.html')
     cy.get('[data-consent-tpl="root"]').should('exist')
     // cy.wait(200)
   })
