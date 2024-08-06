@@ -89,7 +89,7 @@ class SimpleConsent {
      * 
      * @default boolean false
      */
-    consentOnImplicitAction: false,
+    consentOn: false,
 
     /**
      * If set to true, the consent modal will be shown immediately and the user will be required 
@@ -735,8 +735,8 @@ class SimpleConsent {
   #bindImplicitActions() {
 
     // We only want to bind the listeners if the user has not already set their preferences
-    // and if the consentOnImplicitAction array is not empty/falsy.
-    if (! this.#config.consentOnImplicitAction || this.#settings)
+    // and if the consentOn array is not empty/falsy.
+    if (! this.#config.consentOn || this.#settings._datetime)
       return;
 
     const consentToAll = () => {
@@ -768,7 +768,7 @@ class SimpleConsent {
   
     const debouncedAcceptOnScroll = debounce(acceptOnScroll, 100);
 
-    if (this.#config.consentOnImplicitAction.includes('scroll'))
+    if (this.#config.consentOn.includes('scroll'))
       document.addEventListener('scroll', debouncedAcceptOnScroll);
 
     const acceptOnBodyClick = (e) => {
@@ -780,14 +780,14 @@ class SimpleConsent {
 
     }
 
-    if (this.#config.consentOnImplicitAction.includes('click'))
+    if (this.#config.consentOn.includes('click'))
       document.addEventListener('mousedown', acceptOnBodyClick);
 
     const acceptOnClose = (e) => {
       consentToAll();
     }
 
-    if (this.#config.consentOnImplicitAction.includes('banner.close'))
+    if (this.#config.consentOn.includes('banner.close'))
       document.addEventListener(`${this.#_namespace}:banner.close.after`, acceptOnClose);
 
     const removeEventListeners = () => {
@@ -1335,7 +1335,9 @@ class SimpleConsent {
 
   reset() {
     
+    localStorage.removeItem(this.#config.storageName);
     document.cookie = `${this.#config.storageName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+
     this.#settings = null;
 
     this.#loadSettings();
