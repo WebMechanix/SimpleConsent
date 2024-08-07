@@ -5,7 +5,7 @@ window._configs.ccpa = {
     }
   },
   consentModel: 'opt-out',
-  consentOn: ['click', 'scroll', 'banner.close'],
+  consentOn: ['banner.close'],
   content: {
     banner: {
       actions: {
@@ -32,5 +32,6 @@ window._configs.ccpa = {
       denyAll: 'btn btn-secondary',
       showSettings: 'btn btn-link px-0',
     },
+    placement: _configs._.ui.placement,
   },
 };

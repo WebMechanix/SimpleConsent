@@ -157,4 +157,7 @@ window._configs.l10n = {
   },
   services: _configs._.services,
   types: _configs._.types,
+  ui: {
+    placement: _configs._.ui.placement,
+  }
 };

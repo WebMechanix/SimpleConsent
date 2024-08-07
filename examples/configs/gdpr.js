@@ -15,5 +15,6 @@ window._configs.gdpr = {
       denyAll: 'btn btn-primary',
       showSettings: 'btn btn-link px-0',
     },
+    placement: _configs._.ui.placement,
   },
 };
