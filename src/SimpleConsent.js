@@ -32,9 +32,11 @@ class SimpleConsent {
     'showSettings',
   ];
 
+  #config = {};
+
   /**
-   * The main configuation object for the consent manager.
-   * The bulk of the functionality is driven by this object.
+   * The main configuation object defaults for the consent manager.
+   * The bulk of the functionality is driven by this object
    * 
    * This object is resolved through a fair bit of recursion and object merging. Any custom config will be merged with this object.
    * 
@@ -47,7 +49,7 @@ class SimpleConsent {
    * @private
    * @type {Object}
    */
-  #config = {
+  #defaults = {
 
     /**
      * Actions
@@ -368,6 +370,13 @@ class SimpleConsent {
                 {{ description }}
               </div>
               `,
+      settingsButton: `
+                      <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" width="24px" viewBox="0 -960 960 960" fill="currentColor" style="pointer-events: none">
+                          <path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-75 29-147t81-128.5q52-56.5 125-91T475-881q21 0 43 2t45 7q-9 45 6 85t45 66.5q30 26.5 71.5 36.5t85.5-5q-26 59 7.5 113t99.5 56q1 11 1.5 20.5t.5 20.5q0 82-31.5 154.5t-85.5 127q-54 54.5-127 86T480-80Zm-60-480q25 0 42.5-17.5T480-620q0-25-17.5-42.5T420-680q-25 0-42.5 17.5T360-620q0 25 17.5 42.5T420-560Zm-80 200q25 0 42.5-17.5T400-420q0-25-17.5-42.5T340-480q-25 0-42.5 17.5T280-420q0 25 17.5 42.5T340-360Zm260 40q17 0 28.5-11.5T640-360q0-17-11.5-28.5T600-400q-17 0-28.5 11.5T560-360q0 17 11.5 28.5T600-320ZM480-160q122 0 216.5-84T800-458q-50-22-78.5-60T683-603q-77-11-132-66t-68-132q-80-2-140.5 29t-101 79.5Q201-644 180.5-587T160-480q0 133 93.5 226.5T480-160Zm0-324Z"/>
+                        </svg>
+                      </button>
+                      `,
       type:   `
               <div class="consent-type">
                 <div class="consent-switch">
@@ -406,6 +415,7 @@ class SimpleConsent {
       },
       placement: {
         banner: ['bottom', 'left'],
+        settingsButton: ['bottom', 'left'],
       },
       rootClass: 'simple-consent',
       rootId: 'simple-consent',
@@ -471,7 +481,8 @@ class SimpleConsent {
     banner: null,
     modal: null,
     root: null,
-    settings: null
+    settings: null,
+    settingsButton: null,
   };
 
   constructor(config) {
@@ -573,7 +584,7 @@ class SimpleConsent {
       this.#_multiConfig = config;
       config = config._default;
 
-      this.#config = this.#deepMerge(this.#config, config);
+      this.#config = this.#deepMerge(this.#defaults, config);
 
       let router = this.#_multiConfig._router;
 
@@ -608,7 +619,7 @@ class SimpleConsent {
       }
 
     } else {
-      this.#config = this.#deepMerge(this.#config, config);
+      this.#config = this.#deepMerge(this.#defaults, config);
       this.#init();
     }
 
@@ -676,6 +687,7 @@ class SimpleConsent {
 
     document.addEventListener(`${this.#_namespace}:settings.update`, (e) => {
       this.#gtmPush('update');
+      this.show('settingsButton');
     });
 
     document.addEventListener(`${this.#_namespace}:settings.load`, (e) => {
@@ -820,7 +832,13 @@ class SimpleConsent {
         if (! this.#settings.hasOwnProperty(setting) || setting.startsWith('_')) 
           continue;
 
-        obj[setting] = this.#settings[setting] ? 'granted' : 'denied';
+        obj[setting] = this.#boolToStatus(this.#settings[setting]);
+
+        if (this.#types[setting] && this.#types[setting].mapTo) {
+          this.#types[setting].mapTo.forEach((mappedSetting) => {
+            obj[mappedSetting] = this.#boolToStatus(this.#settings[setting]);
+          });
+        }
       
       }
 
@@ -909,6 +927,10 @@ class SimpleConsent {
 
     let payload = this.#convertSettingsToStatusObject();
 
+    let dataLayerEvent = {
+      'default': 'load',
+    }[event] || event;
+
     /**
      * This looks odd - but its intentional.
      * 
@@ -916,12 +938,17 @@ class SimpleConsent {
      * present in the dataLayer before the container is loaded by pushing the consent data WITHOUT an event name.
      * Doing this will enable the use of Initialization, All Pages, and DOM Ready triggers in GTM instead of having to wait for the consent event.
      */
-    if (! this.#config.gtm.loadContainer && event == 'default')
-      payload.event = `${this.#_namespace}.${event}`;
+    // if (! this.#config.gtm.loadContainer && event == 'default')
+      payload.event = `${this.#_namespace}.${dataLayerEvent}`;
 
-    payload.consentModel = this.#config.consentModel;
+    payload.consent = {
+      model: this.#config.consentModel,
+      geo: this.#_geo,
+    };
 
     window.dataLayer.push(payload);
+
+    this.#emit('datalayer.push', payload);
 
   }
 
@@ -991,36 +1018,36 @@ class SimpleConsent {
    */
   #maybeLocalize() {
       
-      if (! this.#config.l10n)
-        return;
-  
-      if (! this.#config.locale) {
-        const lang = document.documentElement.lang;
-        this.#config.locale = lang || null;
-      }
+    if (! this.#config.l10n)
+      return;
 
-      if (! this.#config.locale) {
-        console.info(`ℹ️ ${this.#class}: No locale set or detected on html "lang" attribute.`);
-        return;
-      }
+    if (! this.#config.locale) {
+      const lang = document.documentElement.lang;
+      this.#config.locale = lang || null;
+    }
 
-      this.#config.locale = this.#config.locale.toLowerCase();
+    if (! this.#config.locale) {
+      console.info(`ℹ️ ${this.#class}: No locale set or detected on html "lang" attribute.`);
+      return;
+    }
 
-      const l10n = this.#config.l10n[this.#config.locale];
-  
-      if (! l10n) {
-        console.info(`ℹ️ ${this.#class}: No l10n key found for "${this.#config.locale}".`);
-        return;
-      }
-  
-      if (l10n.content) 
-        this.#config.content = this.#deepMerge(this.#config.content, l10n.content);
-  
-      if (l10n.services)
-        this.#config.services = l10n.services;
-  
-      if (l10n.types)
-        this.#types = l10n.types;
+    this.#config.locale = this.#config.locale.toLowerCase();
+
+    const l10n = this.#config.l10n[this.#config.locale];
+
+    if (! l10n) {
+      console.info(`ℹ️ ${this.#class}: No l10n key found for "${this.#config.locale}".`);
+      return;
+    }
+
+    if (l10n.content) 
+      this.#config.content = this.#deepMerge(this.#config.content, l10n.content);
+
+    if (l10n.services)
+      this.#config.services = l10n.services;
+
+    if (l10n.types)
+      this.#types = l10n.types;
   }
 
   /**
@@ -1074,6 +1101,16 @@ class SimpleConsent {
     }
 
     this.#mountLinks(root);
+
+    this.#ui.settingsButton = this.#parseTemplate('settingsButton', {});
+    this.#bulkSetAttributes(this.#ui.settingsButton, { 
+      'data-consent-tpl': 'settingsButton',
+      'data-consent-action': 'showSettings',
+      'data-consent-placement': this.#config.ui.placement.settingsButton.join(','),
+      'title': 'Edit Preferences',
+    });
+
+    root.appendChild(this.#ui.settingsButton);
 
     // Root
     document.body.appendChild(root);
@@ -1284,8 +1321,10 @@ class SimpleConsent {
     const consentRequired = this.#config.consentRequired;
     const hasStoredSettings = this.#settings._datetime;
 
-    if (hasStoredSettings)
+    if (hasStoredSettings) {
+      this.show('settingsButton');
       return;
+    }
 
     if (! consentRequired) {
       this.show('banner');
@@ -1301,6 +1340,11 @@ class SimpleConsent {
 
     if (['cookie', 'hybrid'].includes(this.#config.storageMethod))
       localStorage.setItem(this.#config.storageName, JSON.stringify(data));
+  }
+
+  #storePurge() {
+    localStorage.removeItem(this.#config.storageName);
+    document.cookie = `${this.#config.storageName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
   }
   
   /* -------------
@@ -1324,6 +1368,15 @@ class SimpleConsent {
     this.save();
   }
 
+  destroy() {
+    this.#emit('destroy');
+    this.#ui.root.remove();
+    this.#storePurge();
+    if (SimpleConsent.#instance) {
+      SimpleConsent.#instance = null;
+    }
+  }
+
   hide(uiKey = 'modal') {
 
     if (this.#config.consentRequired && ! this.#settings)
@@ -1334,9 +1387,10 @@ class SimpleConsent {
   }
 
   reset() {
+
+    this.#emit('reset');
     
-    localStorage.removeItem(this.#config.storageName);
-    document.cookie = `${this.#config.storageName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+    this.#storePurge();
 
     this.#settings = null;
 

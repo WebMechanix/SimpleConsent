@@ -108,14 +108,15 @@
 }
 
 [data-consent-tpl].is-open{
-  display: flex;
+  display: flex !important;
 }
 
 [data-consent-placement*="top"]{ top: var(--consent-banner-offset); }
 [data-consent-placement*="bottom"]{ bottom: var(--consent-banner-offset); }
 
 [data-consent-placement*="left"],
-[data-consent-placement*="right"]{
+[data-consent-placement*="right"],
+[data-consent-placement*="center"]{
   left: var(--consent-banner-offset);
   right: var(--consent-banner-offset);
 }
@@ -255,6 +256,29 @@
 [data-consent-tpl] [data-consent-action="showSettings"]:hover:not([class]),
 [data-consent-tpl] [data-consent-action="showSettings"]:focus:not([class]) {
   color: var(--consent-color-primary-hover);
+}
+
+[data-consent-tpl="settingsButton"][data-consent-action] {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rem !important;
+  padding: 0.5rem !important;
+  font-size: 0.85rem;
+  width: auto;
+  transition: all 0.2s ease-in-out;
+  border: var(--consent-border);
+  background: var(--consent-color-light-grey) !important;
+  color: #826754 !important;
+  box-shadow: var(--consent-box-shadow) !important;
+}
+
+[data-consent-tpl="settingsButton"][data-consent-action] svg{
+  width: 2rem;
+  height: 2rem;
 }
 
 /* ----------------------------------------------
@@ -441,6 +465,11 @@
     --consent-padding-base: 1.5rem;
   }
   
+  [data-consent-placement*="center"]{
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }  
 
   [data-consent-placement*="left"],
   [data-consent-placement*="right"]{ width: var(--consent-banner-max-width); }
