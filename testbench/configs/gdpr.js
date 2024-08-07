@@ -14,6 +14,7 @@ window._configs.gdpr = {
       acceptSelected: 'btn btn-primary',
       denyAll: 'btn btn-primary',
       showSettings: 'btn btn-link px-0',
+      saveSettings: 'btn btn-primary',
     },
     placement: _configs._.ui.placement,
   },

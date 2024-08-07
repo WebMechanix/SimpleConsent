@@ -89,7 +89,7 @@ window._configs = {
     },
     ui: {
       placement: {
-        banner: ['bottom', 'center'],
+        banner: ['bottom', 'right'],
         settingsButton: ['bottom', 'right'],
       }
     }
@@ -107,6 +107,9 @@ if (Url.searchParams.get('container_id'))
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
   let params = {
     lang: Url.searchParams.get('lang'),
     config: Url.searchParams.get('config'),
@@ -120,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let config = window._configs[configKey];
+  Alpine.store('log').config = config;
 
   new SimpleConsent(config);
 
@@ -134,8 +138,6 @@ document.addEventListener('submit', (e) => {
 
   const form = e.target;
   const formData = new FormData(form);
-
-  console.log(`${location.pathname}${(location.search ? '&' : '?')}`);
 
   let queryParams = new URLSearchParams({
     lang: formData.get('lang'),
@@ -197,11 +199,9 @@ const reboot = () => {
   // delete window.google_tag_data;
   // delete window.google_tag_manager;
 
-  window.dataLayer.push(function() {
-    this.clear();
-  });
-
-
+  // window.dataLayer.push(function() {
+  //   this.clear();
+  // });
 
 };
 
@@ -215,7 +215,7 @@ document.addEventListener('simple-consent:datalayer.push', (e) => {
 document.addEventListener('alpine:init', () => {
 
   Alpine.store('log', {
-    config: window._configs[configKey],
+    config: {},
     dataLayer: {},
     tags: [],
     updatedTags: new Set(),

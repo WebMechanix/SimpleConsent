@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimpleConsent TestBench</title>
+
+<!-- Google Tag Manager -->
+<script>
+dataLayer = window.dataLayer || [];
+// (function(w,d,s,l,i){
+  
+//   w[l]=w[l]||[];
+//   w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+
+//   var f=d.getElementsByTagName(s)[0],
+//       j=d.createElement(s),
+//       dl=l!='dataLayer'?'&l='+l:'';
+
+//   j.async=true;
+//   j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+//   f.parentNode.insertBefore(j,f);
+  
+// })(window,document,'script','dataLayer','GTM-PTLD5H79');
+</script>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+<link rel="preconnect" href="https://fonts.bunny.net">
+
+<!-- Styles -->
+
+<link rel="stylesheet" can-disable href="https://fonts.bunny.net/css?family=fira-code:400,500|saira:400,400i,500,500i,700,700i">
+<link rel="stylesheet" href="https://use.typekit.net/nwa6jdq.css">
+<link rel="stylesheet" can-disable href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" can-disable href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link rel="stylesheet" href="assets/testbench.css">
+
+<link href="../dist/SimpleConsent.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-xonokai.min.css" integrity="sha512-WMvUL/ap3JTqQEo4CIbB0jR2ACx+Qxg78UdKIWzV31CrefYZGtxuSod8uJwWDyzeVpQ0vKnXA41vS4UEvlNkoQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- Scripts --> 
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="assets/testbench.js"></script>
+
+<script defer src="./configs/l10n.js"></script>
+<script defer src="./configs/ccpa.js"></script>
+<script defer src="./configs/gdpr.js"></script>
+<script defer src="../dist/SimpleConsent.js"></script>
+</head>
+<body class="d-flex flex-row-reverse align-items-stretch" x-data="{ json_console: (location.search.includes('json_console=false') ? false : true) }">
+  
+  <div class="py-5 w-50 mx-auto vh-100 overflow-auto">
+
+    <div class="container px-3">
+
+      <h1 class="h3 text-center fw-bold mb-5">SimpleConsent TestBench 🧪</h1>
+
+      <form class="d-flex flex-column flex-md-row gap-3 align-items-center justify-content-between" method="get" data-testbench-controls>
+        <div class="d-flex flex-wrap flex-md-nowrap align-items-stretch gap-2">
+
+          <div class="input-group flex-nowrap w-100 w-md-auto">
+            <label class="input-group-text" for="config" data-bs-toggle="tooltip" data-bs-title="Config"><i class="bi bi-braces"></i></label>
+            <select class="form-select flex-shrink-1" name="config" id="config">
+              <option value="_" selected>Default</option>
+              <option value="ccpa">CCPA</option>
+              <option value="gdpr">GDPR</option>
+              <option value="l10n">L10N</option>
+            </select>
+          </div>
+
+          <div class="input-group flex-nowrap w-100 w-md-auto">
+            <label class="input-group-text" for="lang" data-bs-toggle="tooltip" data-bs-title="Language/Locale"><i class="bi bi-translate"></i></label>
+            <select class="form-select flex-shrink-1 text-md-center" name="lang" id="lang">
+              <option value="ar">🇦🇪 Arabic</option>
+              <option value="bn">🇧🇩 Bengali</option>
+              <option value="zh">🇨🇳 Chinese</option>
+              <option value="da">🇩🇰 Danish</option>
+              <option value="nl">🇳🇱 Dutch</option>
+              <option value="en" selected>🇬🇧 English</option>
+              <option value="fi">🇫🇮 Finnish</option>
+              <option value="fr">🇫🇷 French</option>
+              <option value="de">🇩🇪 German</option>
+              <option value="el">🇬🇷 Greek</option>
+              <option value="he">🇮🇱 Hebrew</option>
+              <option value="hi">🇮🇳 Hindi</option>
+              <option value="it">🇮🇹 Italian</option>
+              <option value="ja">🇯🇵 Japanese</option>
+              <option value="ko">🇰🇷 Korean</option>
+              <option value="no">🇳🇴 Norwegian</option>
+              <option value="pl">🇵🇱 Polish</option>
+              <option value="pt-BR">🇧🇷 Portuguese (Brazilian)</option>
+              <option value="pt-PT">🇵🇹 Portuguese (European)</option>
+              <option value="ru">🇷🇺 Russian</option>
+              <option value="es">🇪🇸 Spanish</option>
+              <option value="sv">🇸🇪 Swedish</option>
+              <option value="th">🇹🇭 Thai</option>
+              <option value="tr">🇹🇷 Turkish</option>
+              <option value="uk">🇺🇦 Ukrainian</option>
+              <option value="vi">🇻🇳 Vietnamese</option>
+            </select>
+          </div>
+
+          <div class="input-group flex-nowrap w-md-auto">
+            <label class="input-group-text" for="container_id" data-bs-toggle="tooltip" data-bs-title="Container ID">GTM-</label>
+            <input class="form-control" type="text" name="container_id" id="container_id" placeholder="XXXXXXXX">
+          </div>
+
+        </div>
+        <div class="d-flex gap-3 w-100 w-md-auto align-items-stretch justify-content-between">
+          <div class="form-check form-switch align-self-center m-0">
+            <input class="form-check-input" x-model="json_console" type="checkbox" role="switch" name="json_console" id="json_console" checked>
+            <label class="form-check-label fw-medium text-muted" for="json_console">Console</label>
+          </div>
+          <div class="d-flex gap-2 align-self-stretch">
+            <button class="btn btn-secondary btn-icon" type="button" data-bs-toggle="tooltip" data-bs-title="Reset Manager" onclick="SimpleConsent.manager().reset();"><i class="bi bi-arrow-clockwise"></i></button>
+            <button class="btn btn-primary btn-icon" type="submit" data-bs-toggle="tooltip" data-bs-title="Swap Settings"><i class="bi bi-arrow-left-right"></i></button>
+          </div>
+        </div>
+      </form>
+
+      <div class="position-relative">
+        <hr class="my-5">
+        <span class="badge text-bg-secondary fw-semibold text-uppercase rounded-pill position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">Tag Log</span>
+      </div>
+      
+      <div 
+        x-data="{ 
+          get tags() { 
+            return $store.log.tags 
+          },
+          pulsingTags: new Set(),
+          pulse() {
+            this.pulsingTags = new Set($store.log.updatedTags);
+            setTimeout(() => {
+              this.pulsingTags.clear();
+              $store.log.clearUpdatedTags();
+            }, 1000);
+          }
+        }"
+        x-effect="$store.log.updatedTags.size > 0 && pulse()">
+
+        <template x-for="(tag, index) in $store.log.tags" :key="index" x-cloak>
+          <div :data-tag-id="tag.id" :data-tag-key="tag.key" :class="{ 'pulse': pulsingTags.has(tag.key) }" class="card p-3 mt-2 flex-row align-items-center justify-content-between lh-1 small">
+            <div class=" d-flex gap-2 align-items-center text-muted mr-auto">
+              <span x-text="tag.totalFired" class="badge text-bg-primary"></span>
+              <i class="bi bi-tag-fill flex-shrink-0"></i>
+              <span x-text="tag.name" class="font-monospace"></span>
+            </div>
+            <i class="bi bi-check-circle-fill text-success"></i>
+          </div>
+        </template>
+
+      </div>
+
+      <div class="position-relative">
+        <hr class="my-5">
+        <span class="badge text-bg-secondary fw-semibold text-uppercase rounded-pill position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">End Tag Log</span>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-center gap-2 text-center text-muted mt-4">
+        <button class="btn btn-link btn-sm p-0" data-consent-action="showSettings">Open Settings Modal</button>
+        <!-- / <button class="btn btn-link btn-sm p-0" data-toggle-stylesheets>Disable Stylesheets</button> -->
+      </div>
+
+    </div>
+
+  </div>
+
+  <div x-cloak :class="{ 'd-none': ! json_console }" class="w-50 vh-100 d-flex flex-column align-items-stretch justify-content-stretch border-end border-2 border-dark" style="background: #2a2a2a;">
+    <div x-data="{label: 'config'}" class="h-50 position-relative overflow-hidden border-bottom border-2 border-dark">
+      <pre 
+        class="m-0 overflow-auto position-absolute w-100 h-100" 
+        x-init="$watch('$store.log.config', () => {
+          $nextTick(() => {
+            Prism.highlightElement($el.querySelector('code'));
+          });
+        })"><code class="language-json" data-highlight-key="config" x-text="$store.log.json(label)"></code></pre>
+        <span class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-semibold small px-2 py-1 text-white-50 rounded-1" x-text="label"></span>
+    </div>
+    <div x-data="{label: 'dataLayer'}" class="h-50 position-relative overflow-hidden border-bottom border-2 border-dark">
+      <pre 
+        class="m-0 overflow-auto position-absolute w-100 h-100"  
+        x-init="$watch('$store.log.dataLayer', () => {
+          $nextTick(() => {
+            Prism.highlightElement($el.querySelector('code'));
+          });
+        })"><code class="language-json" data-highlight-key="datalayer" x-text="$store.log.json(label)"></code></pre>
+      <span class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-semibold small px-2 py-1 text-white-50 rounded-1" x-text="label"></span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+</body>
+</html>
