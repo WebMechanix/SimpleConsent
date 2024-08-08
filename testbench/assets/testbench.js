@@ -220,16 +220,7 @@ document.addEventListener('alpine:init', () => {
     tags: [],
     updatedTags: new Set(),
     updateDataLayer(data) {
-      let newObject = {
-        event: data.event,
-        consent: data.consent,
-      };
-      for (let key in data) {
-        if (['event', 'consent', 'gtm.uniqueEventId'].includes(key))
-          continue;
-        newObject[key] = data[key];
-      }
-      this.dataLayer = newObject;
+      this.dataLayer = data;
     },
     json(key) {
       return JSON.stringify(this[key], null, 2);
