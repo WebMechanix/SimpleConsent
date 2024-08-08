@@ -1,7 +1,8 @@
-describe('Base Config', () => {
+describe('UI Behavior', () => {
 
   beforeEach(() => {
-    cy.visit('http://localhost:8080/examples/test.html')
+    cy.task('clearCache')
+    cy.visit(`http://localhost:8080/testbench?json_console=false&_cachebuster=${Date.now()}`)
     cy.get('[data-consent-tpl="root"]').should('exist')
     // cy.wait(200)
   })
@@ -10,9 +11,9 @@ describe('Base Config', () => {
     cy.clearCookies()
   })
 
-  // afterEach(() => {
-  //   cy.wait(800)
-  // })
+  afterEach(() => {
+    cy.wait(800)
+  })
 
   it('Banner is visible on load', () => {
     cy.get('[data-consent-tpl="banner"]').should('be.visible')
@@ -84,7 +85,7 @@ describe('Base Config', () => {
       .find('[data-consent-action="showSettings"]').click()
     
     cy.get('[data-consent-tpl="modal"]').as('modal')
-      .find('input[name="analytics_storage"], input[name="ad_user_data"]').check()
+      .find('input[name="advertising"]').check()
     
     cy.get('@modal')
       .find('[data-consent-action="acceptSelected"]').click()
@@ -92,7 +93,8 @@ describe('Base Config', () => {
     cy.getCookie('simple_consent').should('exist')
       .then((cookie) => {
         const settings = JSON.parse(decodeURIComponent(cookie.value))
-        expect(settings).to.have.property('analytics_storage', true)
+        expect(settings).to.have.property('ad_storage', true)
+        expect(settings).to.have.property('ad_personalization', true)
         expect(settings).to.have.property('ad_user_data', true)
       })
 
