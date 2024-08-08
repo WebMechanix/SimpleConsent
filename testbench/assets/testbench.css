@@ -31,7 +31,7 @@ body.stylesheets-disabled{
 }
 
 .container{
-  max-width: 800px;
+  max-width: 840px;
   margin: 0 auto;
 }
 
@@ -87,6 +87,10 @@ body pre[class*=language-]{
 }
 code[class*=language-], pre[class*=language-]{
   font-family: var(--bs-font-monospace) !important;
+}
+
+pre[class*=language-] code{
+  white-space: break-spaces;
 }
 
 @keyframes pulse {
