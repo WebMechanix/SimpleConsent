@@ -890,12 +890,10 @@ class SimpleConsent {
 
   #gtmSetDataLayer() {
 
-    // @consider - custom dataLayer name support. Hardly anyone does this.
-    // Simo's "Consent Mode (Google tags)" tag template uses "dataLayer" as the default and it can't be customized.
     window.dataLayer = window.dataLayer || [];
 
-    // if (! window.gtag)
-    //   window.gtag = function() { window.dataLayer.push(arguments); }
+    if (! window.gtag)
+      window.gtag = function() { window.dataLayer.push(arguments); }
 
   }
 
@@ -925,11 +923,13 @@ class SimpleConsent {
     
     // window.gtag('consent', event, this.#convertSettingsToStatusObject());
 
-    let payload = this.#convertSettingsToStatusObject();
+    let consentStatus = this.#convertSettingsToStatusObject();
 
     let dataLayerEvent = {
       'default': 'load',
     }[event] || event;
+
+    window.gtag('consent', event, consentStatus);
 
     /**
      * This looks odd - but its intentional.
@@ -939,12 +939,16 @@ class SimpleConsent {
      * Doing this will enable the use of Initialization, All Pages, and DOM Ready triggers in GTM instead of having to wait for the consent event.
      */
     // if (! this.#config.gtm.loadContainer && event == 'default')
-      payload.event = `${this.#_namespace}.${dataLayerEvent}`;
-
-    payload.consent = {
-      model: this.#config.consentModel,
-      geo: this.#_geo,
+    let payload = {
+      event: `${this.#_namespace}:${dataLayerEvent}`,
+      consentMeta: {
+        model: this.#config.consentModel,
+        geo: this.#_geo,
+        gpc: this.#signals.gpc,
+      },
     };
+
+    payload = Object.assign(payload, consentStatus);
 
     window.dataLayer.push(payload);
 
