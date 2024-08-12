@@ -41,17 +41,20 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 
 ### SimpleConsent might be for you if...
 
-1. ✅ You use Google Tag Manager (GTM) for managing your tags
-2. ✅ You aren't afraid to write some basic JS/JSON and CSS
-3. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot (etc...)
+1. ✅ You use Google Tag Manager (GTM) as your TMS
+2. ✅ You aren't afraid to write some basic JS/JSON and CSS to configure and customize it.
+3. ✅ You want a 1st party solution that doesn't rely on 3rd party services. 
+4. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot hurting your site's performance.
 
 ### SimpleConsent isn't for you if...
 
-1. ❌ You don't use a TMS like Google Tag Manager for controlling tag firing
-2. ❌ You need full-fledged "autoblocking" behavior
-3. ❌ You require IAB TCF v2.X compliance/compaitibility (for now - this may change in the future)
-4. ❌ You require support for dead browsers like Internet Explorer (we'll never do this don't ask)
-5. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
+1. ❌ You don't use Google Tag Manager (GTM) as your TMS
+2. ❌ You require "autoblocking" behavior
+3. ❌ You want a "low code" solution.
+4. ❌ You require IAB TCF v2.X compaitibility (might be added in the future - no promises)
+5. ❌ You require AMP compatibility (no plans to support this)
+6. ❌ You require support for dead browsers like Internet Explorer (no plans to support this)
+7. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
 ---
 
@@ -140,11 +143,65 @@ Consent types are the individual categories of data collection that your website
 
 Each consent type is defined with its own "key" (e.g. `analytics_storage`, `advertising`, etc...). These keys are used to reference the consent types in the configuration object. These are also the keys that are used when pushing `dataLayer` events to Google Tag Manager, and also the stored consent object in cookies and/or localStorage.
 
-#### Sample GTM Container Configuration
+### Google Tag Manager Configuration
 
-@todo
+#### `simple-consent:load` Event
 
-Proper configuration of this tool with Google Tag Manager does require some triggers and consent default/update tags to be configured. As a result, a sample GTM container configuration is provided in the `gtm` directory of this repository. This configuration assumes the use of the 7 main consent types provided by the library. If you have customized your consent types, you will need to create triggers to match the consent types you have defined.
+When the consent banner is loaded, a `dataLayer` event is pushed to Google Tag Manager with the following structure:
+
+```javascript
+dataLayer.push({
+  event: 'simple-consent:load',
+  consentMeta: {
+    consentModel: 'opt-in', // opt-in or opt-out - pulled from the loaded config.
+    geo: null,              // a value from your own geolocation lookup if using a multi-config setup null otherwise
+    gpc: false,             // true if the user has Global Privacy Control enabled false otherwise
+  },
+  // key:value pairs for each consent type set to "granted" or "denied".
+  // If a type is mapped to another type, the mapped type will be set to the same value as the original type (see "mapTo" in the advertising type definition above)
+  analytics_storage: 'denied',
+  advertising: 'denied',
+  ad_storage: 'denied',
+  ad_personalization: 'denied',
+  ad_user_data: 'denied',
+  personalization_storage: 'denied',
+  functionality_storage: 'denied',
+  security_storage: 'granted',
+})
+```
+
+Directly before the `simple-consent:load` event payload is pushed, a `gtag('consent', 'default', {})` command is pushed with the same payload (minus the `event`, and `consentMeta` properties). This ensures that the consent signal is properly set in Google Tag Manager before any tags configured to use the consent signal are fired.
+
+#### `simple-consent:update` Event
+
+```javascript
+dataLayer.push({
+  event: 'simple-consent:update',
+  consentMeta: { 
+    //... 
+  },
+  analytics_storage: 'granted',
+  advertising: 'granted',
+  ad_storage: 'granted',
+  ad_personalization: 'granted',
+  ad_user_data: 'granted',
+  personalization_storage: 'granted',
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+})
+```
+
+Similar to `simple-consent:load`, directly before the `simple-consent:update` event payload is pushed, a `gtag('consent', 'update', { ... })` command is pushed with the same payload (minus the `event`, and `consentMeta` properties).
+
+#### Trigger/Variable Setup
+
+The in most cases - you'll likely have a "Consent / grated - [type]" trigger for each consent type that you want to fire tags on. It's suggested to use a custom event trigger that matches both the load and update events via regex `simple-consent:(load|update)` to handle both opt-in and opt-out consent models.
+
+##### IMPORTANT NOTES
+- You should not use any "All Pages", "Initialization", or "Consent Initialization" trigger types for any of your tags that require consent. Doing so will result in the tags firing before the consent signals are set. Instead, use the `simple-consent:load` custom event as a trigger for your tags that should fire on page load or related events.
+- Be aware that the "Require additional consent for tag to fire" has a known bug with "fire one per page" tags. For this reason, its best to avoid using the additional consent checks feature at this point in time.
+
+##### Sample GTM Container Configuration
 
 #### Contributing
 

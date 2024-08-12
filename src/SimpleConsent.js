@@ -920,8 +920,6 @@ class SimpleConsent {
   }
 
   #gtmPush(event) {
-    
-    // window.gtag('consent', event, this.#convertSettingsToStatusObject());
 
     let consentStatus = this.#convertSettingsToStatusObject();
 
@@ -931,14 +929,6 @@ class SimpleConsent {
 
     window.gtag('consent', event, consentStatus);
 
-    /**
-     * This looks odd - but its intentional.
-     * 
-     * If the library is responsible for loading the GTM contianer, we can make sure the consent settings are
-     * present in the dataLayer before the container is loaded by pushing the consent data WITHOUT an event name.
-     * Doing this will enable the use of Initialization, All Pages, and DOM Ready triggers in GTM instead of having to wait for the consent event.
-     */
-    // if (! this.#config.gtm.loadContainer && event == 'default')
     let payload = {
       event: `${this.#_namespace}:${dataLayerEvent}`,
       consentMeta: {
