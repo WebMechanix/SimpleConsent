@@ -82,7 +82,7 @@ dataLayer = window.dataLayer || [];
                   d="m411.76,131.04c-3.31-4.61-8.39-8.19-13.99-9.73l.76.26c-17.29-6.15-65.86-9.47-113.67-10.24h-64.08c-45.77,1.28-90.79,4.35-107.57,10.24l.76-.26c-5.59,1.54-10.68,5.12-13.99,9.73-12.97,17.93-13.99,97.82-13.99,121.89v5.89c0,24.33,1.02,104.22,14.24,121.89,3.31,4.61,8.39,8.2,13.99,9.73l-.76-.25c20.85,7.17,86.46,10.5,142.15,10.5h.76c55.69,0,121.3-3.33,142.15-10.5l-.76.25c5.59-1.54,10.68-5.12,13.99-9.73,13.22-17.67,14.24-97.82,14.24-121.89v-5.89c0-24.07-1.02-103.97-14.24-121.89Zm-12.03,129.79c0,58.45-4.81,95.72-8.36,103.89l-.25.25c-12.67,4.34-63.6,9.19-133.02,9.19h-1.01c-21.03,0-40.29-.51-57.52-1.28-2.53-2.81-5.07-5.61-7.6-7.91,1.01-3.06,2.03-6.13,2.79-9.19.76-3.06,1.27-6.38,1.27-9.44,5.07-1.28,10.39-3.06,15.46-5.11-.25-3.06-.25-6.13-.76-9.19-5.32-1.53-10.64-2.55-16.22-3.32-.76-3.06-1.77-6.13-2.79-9.19-1.27-2.81-2.53-5.87-4.31-8.42,3.55-4.34,6.84-8.68,9.63-13.53-1.77-2.55-3.8-4.85-5.83-6.89-5.32,1.79-10.39,4.34-14.95,7.15-2.28-2.04-4.81-4.08-7.6-5.62-2.53-1.79-5.57-3.06-8.36-4.34.51-5.36.51-10.98,0-16.59-2.79-.77-5.57-1.53-8.61-2.04-3.04,4.85-5.83,9.7-8.11,14.8-3.04-.26-6.08-.26-9.37,0-3.04.51-6.08.77-9.12,1.79-2.79-4.85-6.08-9.44-9.38-13.53-.25,0-.51.26-.76.26v-13.62c0-61.35,4.81-100.47,8.36-109.05h.25c12.67-4.55,63.6-9.65,133.28-9.65h1.01c69.68,0,120.61,4.82,133.02,9.65h.25c3.55,8.57,8.36,47.69,8.36,109.05v1.88h.25Z"
               />
           </svg>
-          <span class="fs-5">SimpleConsent <span class="d-block fw-normal smaller text-muted"> <span class="lh-1">🧪</span> TestBench</span></span></h1>
+          <span class="fs-5">SimpleConsent <span class="d-block fw-medium smaller text-muted"><span class="lh-1">🧪</span> TestBench</span></span></h1>
       
         <div data-testbench-inputs class="d-flex flex-wrap flex-md-nowrap align-items-stretch gap-2">
 
@@ -246,7 +246,7 @@ dataLayer = window.dataLayer || [];
             Alpine.store('log').editors[label].setValue($store.log.json(label), -1);
           });
         })"></div>
-        <span class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 text-white-50 rounded-1" x-text="label"></span>
+        <code class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
     </div>
     <div x-data="{label: 'dataLayer'}" class="h-50 position-relative overflow-hidden border-bottom border-2 border-dark">
       <div 
@@ -257,7 +257,7 @@ dataLayer = window.dataLayer || [];
             Alpine.store('log').editors[label].setValue($store.log.json(label), -1);
           });
         })"></div>
-      <span class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 text-white-50 rounded-1" x-text="label"></span>
+      <code class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
     </div>
   </aside>
 
@@ -287,14 +287,18 @@ dataLayer = window.dataLayer || [];
             <input type="hidden" name="config_name" x-model="$store.configEditor.name" pattern="[a-zA-Z0-9\- ]{3,}">
           </template>
         </div>
-        <div class="modal-footer border-black" :class="{'justify-content-between': $store.configEditor.name}">
-          <template x-if="($store.configEditor.mode === 'new') && $store.configEditor.name">
-            <div class="d-inline-flex gap-2 align-items-center small lh-1 text-light">
-              <sprite-icon symbol="info-circle-fill"></sprite-icon> <span>Config will be stored in localStorage as</span> <code class="bg-transparent p-0 border-0" x-text="$store.configEditor.makeConfigKey()"></code>
-            </div>
-          </template>
+        <div class="modal-footer justify-content-start gap-3 border-black">
           <input type="hidden" name="mode" x-model="$store.configEditor.mode">
-          <button type="submit" class="btn btn-primary">Save Config</button>
+          <button type="submit" class="btn btn-secondary">Save Config</button>
+          <template x-if="($store.configEditor.mode === 'new') && $store.configEditor.name">
+            <p class="d-flex gap-2 align-items-center text-light m-0">
+              <sprite-icon symbol="info-circle-fill"></sprite-icon> 
+              <span>
+                Config will be stored in localStorage as:
+                <code class="bg-transparent position-relative" x-text="$store.configEditor.makeConfigKey()"></code>
+              </span>
+            </p>
+          </template>
         </div>
       </div>
     </div>

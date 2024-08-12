@@ -203,12 +203,6 @@ document.addEventListener('submit', (e) => {
   const configKey = formData.get('config_name').startsWith('simple-consent:config.') ? formData.get('config_name') : Alpine.store('configEditor').makeConfigKey(formData.get('config_name'));
   const configJson = JSON.stringify(JSON.parse(formData.get('config_json')));
 
-  console.log({
-    configKey,
-    configJson,
-    configValid: validateJson(formData.get('config_json'))
-  });
-
   if (formData.get('mode') === 'new')
       Alpine.store('controls').addConfig({ key: configKey, config: configJson });
 
