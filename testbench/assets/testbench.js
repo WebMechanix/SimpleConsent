@@ -89,7 +89,7 @@ window._configs = {
     },
     ui: {
       placement: {
-        banner: ['bottom', 'right'],
+        banner: ['bottom', 'center'],
         settingsButton: ['bottom', 'right'],
       }
     }
@@ -110,19 +110,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-  let params = {
-    lang: Url.searchParams.get('lang'),
-    config: Url.searchParams.get('config'),
-    container_id: Url.searchParams.get('container_id'),
-  };
-  
-  for (let key in params) {
-    let input = document.querySelector(`[name="${key}"]`);
-    if (input && params[key]) 
-      input.value = params[key];
-  }
+  const header = document.querySelector('header[data-testbench-header]');
+  const main = document.querySelector('main[data-testbench-body]');
+  const footer = document.querySelector('footer[data-testbench-footer]');
+
+  main.style.minHeight = `calc(100vh - (${header.offsetHeight + (footer.offsetHeight)}px)`;
 
   let config = window._configs[configKey];
+  window._configs[configKey].gtm = window._configs._.gtm;
+  window._configs[configKey].ui = window._configs._.ui;
   Alpine.store('log').config = config;
 
   new SimpleConsent(config);
@@ -157,6 +153,9 @@ document.addEventListener('submit', (e) => {
 
   configKey = formData.get('config');
 
+  window._configs[configKey].gtm = window._configs._.gtm;
+  window._configs[configKey].ui = window._configs._.ui;
+
   Alpine.store('log').config = window._configs[configKey];
   Alpine.store('log').dataLayer = {};
 
@@ -164,75 +163,191 @@ document.addEventListener('submit', (e) => {
 
 });
 
-document.addEventListener('click', (e) => {
+const loadCustomConfigs = () => {
+  
+  const items = [];
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('simple-consent:config.')) {
+      const config = localStorage.getItem(key);
+      window._configs[key] = JSON.parse(config);
+      items.push({ key, config });
+    }
+  }
 
-  if (! e.target.hasAttribute('data-toggle-stylesheets'))
+  return items;
+
+}
+
+document.addEventListener('submit', (e) => {
+
+  if (! e.target.hasAttribute('data-testbench-config-editor')) 
     return;
 
   e.preventDefault();
 
-  e.target.innerText = e.target.innerText === 'Enable Stylesheets' ? 'Disable Stylesheets' : 'Enable Stylesheets';
-  document.body.classList.toggle('stylesheets-disabled');
+  const form = e.target;
+  const formData = new FormData(form);
+  const modal = bootstrap.Modal.getInstance(e.target);
 
-  const stylesheets = document.querySelectorAll('link[can-disable]');
-  stylesheets.forEach(stylesheet => {
-    stylesheet.disabled = ! stylesheet.disabled;
+  const validateJson = (json) => {
+    try {
+      JSON.parse(json);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const configKey = formData.get('config_name').startsWith('simple-consent:config.') ? formData.get('config_name') : Alpine.store('configEditor').makeConfigKey(formData.get('config_name'));
+  const configJson = JSON.stringify(JSON.parse(formData.get('config_json')));
+
+  console.log({
+    configKey,
+    configJson,
+    configValid: validateJson(formData.get('config_json'))
   });
+
+  if (formData.get('mode') === 'new')
+      Alpine.store('controls').addConfig({ key: configKey, config: configJson });
+
+  localStorage.setItem(configKey, configJson);
+
+  modal.hide();
+  
+  Alpine.store('configEditor').reset();
 
 });
 
-/**
- * Logger Functionality
- */
+document.addEventListener('click', (e) => {
+
+  if (! e.target.matches('a[href*="webmechanix.com"], a[href*="level.agency"], a[href*="derekcavaliero.com"]'))
+    return;
+
+  e.target.target = '_blank';
+  e.target.href += '?utm_source=Open%20Source&utm_medium=SimpleConsent&utm_campaign=Derek%20Cavaliero';
+
+});
 
 function logTag(tag) {
   const event = new CustomEvent(`cy:gtm.tag.fired`, {detail: tag});
   document.dispatchEvent(event);
 }
 
-const reboot = () => {
-
-  Alpine.store('log').tags = [];
-
-  // document.querySelectorAll('script[src*="www.googletagmanager.com"]').forEach(script => script.remove());
-  
-  // delete window.google_tag_data;
-  // delete window.google_tag_manager;
-
-  // window.dataLayer.push(function() {
-  //   this.clear();
-  // });
-
-};
+const reboot = () => Alpine.store('log').tags = [];
 
 document.addEventListener('simple-consent:destroy', reboot);
 document.addEventListener('simple-consent:reset', reboot);
-
-document.addEventListener('simple-consent:datalayer.push', (e) => {
-  Alpine.store('log').updateDataLayer(e.detail);
-});
+document.addEventListener('simple-consent:datalayer.push', (e) => Alpine.store('log').updateDataLayer(e.detail) );
 
 document.addEventListener('alpine:init', () => {
+
+  Alpine.store('configEditor', {
+    editor: null,
+    errors: {
+      json: null,
+      name: null,
+    },
+    json: {},
+    modal: new bootstrap.Modal(document.querySelector('[data-testbench-config-editor]')),
+    mode: 'new',
+    name: '',
+    bootEditor() {
+      this.editor = ace.edit('editor');
+
+      this.editor.setValue("{\n\t\n}", -1);
+      
+      this.editor.session.on("change", () => {
+        this.json = this.editor.getValue();
+      });
+    
+      this.editor.setTheme('ace/theme/one_dark');
+      this.editor.setShowPrintMargin(false);
+      this.editor.renderer.setScrollMargin(16, 16);
+      this.editor.session.setTabSize(2);
+      this.editor.session.setUseWrapMode(true);
+      this.editor.session.setMode('ace/mode/json');
+    },
+    makeConfigKey(str) {
+
+      if (! str)
+        str = this.name;
+
+      return `simple-consent:config.${str.toLowerCase().replace(/[^a-z0-9\-]/g, '-')}`;
+
+    },
+    new() {
+      this.modal.show();
+    },
+    edit(configKey) {
+      this.name = configKey;
+      this.mode = 'edit';
+      this.json = Alpine.store('controls').getConfig(configKey);
+      this.editor.setValue(JSON.stringify(this.json, null, 2), -1);
+      this.modal.show();
+    },
+    reset() {
+      this.editor.setValue("{\n\t\n}", -1);
+      this.json = {};
+      this.name = '';
+      this.mode = 'new';
+      this.errors = { json: null, name: null };
+    }
+  });
+
+  Alpine.store('configEditor').bootEditor();
+
+  Alpine.store('controls', {
+    lang: Url.searchParams.get('lang') || 'en',
+    config: Url.searchParams.get('config') || '_',
+    customConfigs: loadCustomConfigs(),
+    containerId: Url.searchParams.get('container_id') || '',
+    addConfig(config) {
+      this.customConfigs.push(config);
+    },
+    getConfig(configKey) {
+      return window._configs[configKey];
+    },
+    getConfigOptionLabel(config) {
+      return config.key.replace('simple-consent:config.', '');
+    },
+    loadConfig(configKey) {},
+  });
 
   Alpine.store('log', {
     config: {},
     dataLayer: {},
+    editors: {
+      config: null,
+      dataLayer: null,
+    },
     tags: [],
     updatedTags: new Set(),
-    updateDataLayer(data) {
-      this.dataLayer = data;
-    },
-    json(key) {
-      return JSON.stringify(this[key], null, 2);
+    bootEditors() {
+
+      [
+        'config',
+        'dataLayer',
+      ].forEach(key => {
+
+        this.editors[key] = ace.edit(document.querySelector(`[data-ace-editor="${key}"]`));
+        this.editors[key].setTheme('ace/theme/one_dark');
+        this.editors[key].setShowPrintMargin(false);
+        this.editors[key].setReadOnly(true);
+        this.editors[key].renderer.setScrollMargin(16, 16);
+        this.editors[key].session.setTabSize(2);
+        this.editors[key].session.setUseWrapMode(true);
+        this.editors[key].session.setMode('ace/mode/json');
+
+      });
+
     },
     addTag(tag) {
       tag.totalFired = 1;
       tag.triggerEvent = [tag.triggerEvent];
       this.tags.push(tag);
       this.updatedTags.add(tag.key);
-    },
-    findTag(key) {
-      return this.tags.find(tag => tag.key === key);
     },
     addOrUpdateTag(tag) {
       const existingTag = this.findTag(tag.key);
@@ -246,8 +361,19 @@ document.addEventListener('alpine:init', () => {
     },
     clearUpdatedTags() {
       this.updatedTags.clear();
-    }
-  });  
+    },
+    findTag(key) {
+      return this.tags.find(tag => tag.key === key);
+    },
+    json(key) {
+      return JSON.stringify(this[key], null, 2);
+    },
+    updateDataLayer(data) {
+      this.dataLayer = data;
+    },
+  }); 
+
+  Alpine.store('log').bootEditors();
 
   document.addEventListener('cy:gtm.tag.fired', (event) => {
 
