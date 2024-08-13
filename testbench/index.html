@@ -12,6 +12,7 @@ dataLayer = window.dataLayer || [];
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
 <link rel="preconnect" href="https://use.typekit.net">
 <link rel="preconnect" href="https://fonts.bunny.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
 
 <!-- Styles -->
 <link rel="stylesheet" href="https://use.typekit.net/dlq7tmk.css">
@@ -30,94 +31,95 @@ dataLayer = window.dataLayer || [];
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <!-- SimpleConsent -->
-
-<script defer src="./configs/l10n.js"></script>
-<script defer src="./configs/ccpa.js"></script>
-<script defer src="./configs/gdpr.js"></script>
 <script defer src="../dist/SimpleConsent.js"></script>
 
 </head>
-<body class="d-flex flex-row-reverse align-items-stretch" x-data="{ json_console: (location.search.includes('json_console=false') ? false : true) }">
+<body class="d-flex flex-row align-items-stretch" x-data="{ json_console: (location.search.includes('json_console=false') ? false : true) }">
   
   <div class="w-100 vh-100 mx-auto overflow-auto" data-testbench-html>
 
     <header data-testbench-header class="position-sticky z-3 top-0 start-0 end-0 p-3 shadow-sm border-bottom border-secondary-subtle bg-white">
       <form data-testbench-controls x-data class="d-flex align-items-center justify-content-between gap-3">
         
-        <h1 class="d-flex align-items-center gap-3 my-0 fw:800 lh-sm">
+        <h1 class="brand d-flex align-items-center gap-3 my-0 fw:800 lh-sm">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              viewBox="0 0 512 512"
-              class="brand aspect:1/1 rounded"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 512 512"
+            class="aspect:1/1 rounded-3"
           >
-              <defs>
-                  <style>
-                      .wmx-gradient--optimism-to-daydream {
-                          fill: url(#wmx-gradient--optimism-to-daydream);
-                      }
-                  </style>
-                  <linearGradient
-                      id="wmx-gradient--optimism-to-daydream"
-                      x1="-46.26"
-                      y1="430.51"
-                      x2="558.26"
-                      y2="81.49"
-                      gradientUnits="userSpaceOnUse"
-                  >
-                      <stop offset="0" stop-color="#009fd4" />
-                      <stop offset="1" stop-color="#46b756" />
-                  </linearGradient>
-              </defs>
-              <rect
-                  class="wmx-gradient--optimism-to-daydream"
-                  x=".5"
-                  y=".5"
-                  width="511"
-                  height="511"
-              />
-              <path d="m511,1v510H1V1h510m1-1H0v512h512V0h0Z" />
-              <path
-                  fill="#ffffff"
-                  d="m411.76,131.04c-3.31-4.61-8.39-8.19-13.99-9.73l.76.26c-17.29-6.15-65.86-9.47-113.67-10.24h-64.08c-45.77,1.28-90.79,4.35-107.57,10.24l.76-.26c-5.59,1.54-10.68,5.12-13.99,9.73-12.97,17.93-13.99,97.82-13.99,121.89v5.89c0,24.33,1.02,104.22,14.24,121.89,3.31,4.61,8.39,8.2,13.99,9.73l-.76-.25c20.85,7.17,86.46,10.5,142.15,10.5h.76c55.69,0,121.3-3.33,142.15-10.5l-.76.25c5.59-1.54,10.68-5.12,13.99-9.73,13.22-17.67,14.24-97.82,14.24-121.89v-5.89c0-24.07-1.02-103.97-14.24-121.89Zm-12.03,129.79c0,58.45-4.81,95.72-8.36,103.89l-.25.25c-12.67,4.34-63.6,9.19-133.02,9.19h-1.01c-21.03,0-40.29-.51-57.52-1.28-2.53-2.81-5.07-5.61-7.6-7.91,1.01-3.06,2.03-6.13,2.79-9.19.76-3.06,1.27-6.38,1.27-9.44,5.07-1.28,10.39-3.06,15.46-5.11-.25-3.06-.25-6.13-.76-9.19-5.32-1.53-10.64-2.55-16.22-3.32-.76-3.06-1.77-6.13-2.79-9.19-1.27-2.81-2.53-5.87-4.31-8.42,3.55-4.34,6.84-8.68,9.63-13.53-1.77-2.55-3.8-4.85-5.83-6.89-5.32,1.79-10.39,4.34-14.95,7.15-2.28-2.04-4.81-4.08-7.6-5.62-2.53-1.79-5.57-3.06-8.36-4.34.51-5.36.51-10.98,0-16.59-2.79-.77-5.57-1.53-8.61-2.04-3.04,4.85-5.83,9.7-8.11,14.8-3.04-.26-6.08-.26-9.37,0-3.04.51-6.08.77-9.12,1.79-2.79-4.85-6.08-9.44-9.38-13.53-.25,0-.51.26-.76.26v-13.62c0-61.35,4.81-100.47,8.36-109.05h.25c12.67-4.55,63.6-9.65,133.28-9.65h1.01c69.68,0,120.61,4.82,133.02,9.65h.25c3.55,8.57,8.36,47.69,8.36,109.05v1.88h.25Z"
-              />
+            <defs>
+              <style>
+                .wmx-gradient--optimism-to-daydream {
+                  fill: url(#wmx-gradient--optimism-to-daydream);
+                }
+              </style>
+              <linearGradient
+                id="wmx-gradient--optimism-to-daydream"
+                x1="-46.26"
+                y1="430.51"
+                x2="558.26"
+                y2="81.49"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop offset="0" stop-color="#009fd4" />
+                <stop offset="1" stop-color="#46b756" />
+              </linearGradient>
+            </defs>
+            <rect
+              class="wmx-gradient--optimism-to-daydream"
+              x=".5"
+              y=".5"
+              width="511"
+              height="511"
+            />
+            <path d="m511,1v510H1V1h510m1-1H0v512h512V0h0Z" />
+            <path
+              fill="#ffffff"
+              d="m411.76,131.04c-3.31-4.61-8.39-8.19-13.99-9.73l.76.26c-17.29-6.15-65.86-9.47-113.67-10.24h-64.08c-45.77,1.28-90.79,4.35-107.57,10.24l.76-.26c-5.59,1.54-10.68,5.12-13.99,9.73-12.97,17.93-13.99,97.82-13.99,121.89v5.89c0,24.33,1.02,104.22,14.24,121.89,3.31,4.61,8.39,8.2,13.99,9.73l-.76-.25c20.85,7.17,86.46,10.5,142.15,10.5h.76c55.69,0,121.3-3.33,142.15-10.5l-.76.25c5.59-1.54,10.68-5.12,13.99-9.73,13.22-17.67,14.24-97.82,14.24-121.89v-5.89c0-24.07-1.02-103.97-14.24-121.89Zm-12.03,129.79c0,58.45-4.81,95.72-8.36,103.89l-.25.25c-12.67,4.34-63.6,9.19-133.02,9.19h-1.01c-21.03,0-40.29-.51-57.52-1.28-2.53-2.81-5.07-5.61-7.6-7.91,1.01-3.06,2.03-6.13,2.79-9.19.76-3.06,1.27-6.38,1.27-9.44,5.07-1.28,10.39-3.06,15.46-5.11-.25-3.06-.25-6.13-.76-9.19-5.32-1.53-10.64-2.55-16.22-3.32-.76-3.06-1.77-6.13-2.79-9.19-1.27-2.81-2.53-5.87-4.31-8.42,3.55-4.34,6.84-8.68,9.63-13.53-1.77-2.55-3.8-4.85-5.83-6.89-5.32,1.79-10.39,4.34-14.95,7.15-2.28-2.04-4.81-4.08-7.6-5.62-2.53-1.79-5.57-3.06-8.36-4.34.51-5.36.51-10.98,0-16.59-2.79-.77-5.57-1.53-8.61-2.04-3.04,4.85-5.83,9.7-8.11,14.8-3.04-.26-6.08-.26-9.37,0-3.04.51-6.08.77-9.12,1.79-2.79-4.85-6.08-9.44-9.38-13.53-.25,0-.51.26-.76.26v-13.62c0-61.35,4.81-100.47,8.36-109.05h.25c12.67-4.55,63.6-9.65,133.28-9.65h1.01c69.68,0,120.61,4.82,133.02,9.65h.25c3.55,8.57,8.36,47.69,8.36,109.05v1.88h.25Z"
+            />
           </svg>
-          <span class="fs-5">SimpleConsent <span class="d-block fw-medium smaller text-muted"><span class="lh-1">🧪</span> TestBench</span></span></h1>
+          <span class="fs-5">
+            SimpleConsent 
+            <span class="d-block fw-medium smaller text-muted">
+              <span class="lh-1">🧪</span> TestBench
+            </span>
+          </span>
+        </h1>
       
         <div data-testbench-inputs class="d-flex flex-wrap flex-md-nowrap align-items-stretch gap-2">
 
           <div class="input-group flex-nowrap w-100 w-md-auto">
-            <label class="input-group-text" for="config" data-bs-toggle="tooltip" data-bs-title="Config">
+            <label class="input-group-text" for="config" data-bs-toggle="tooltip" data-bs-title="Config" data-bs-placement="bottom">
               <sprite-icon symbol="braces"></sprite-icon>
             </label>
-            <select class="form-select flex-shrink-1" x-model="$store.controls.config" name="config" id="config">
-              <optgroup label="Custom Configs">
-                <template x-for="config in $store.controls.customConfigs">
-                  <option :selected="config.key == $store.controls.config" :value="config.key" x-text="$store.controls.getConfigOptionLabel(config)"></option>
+            <select class="form-select flex-shrink-1" x-model="$store.app.controls.config" name="config" id="config" @change="$store.app.changeConfig($el.value)">
+              <optgroup label="Default Configs">
+                <template x-for="[key, config] in Object.entries($store.app.configs.default)">
+                  <option :selected="key == $store.app.controls.config" :value="key" x-text="key"></option>
                 </template>
               </optgroup>
-              <optgroup label="Default Configs">
-                <option value="_" selected>Default</option>
-                <option value="ccpa">CCPA</option>
-                <option value="gdpr">GDPR</option>
-                <option value="l10n">L10N</option>
-              </optgroup>
+              <template x-if="Object.keys($store.app.configs.custom).length > 0">
+                <optgroup label="Custom Configs">
+                  <template x-for="[key, config] in Object.entries($store.app.configs.custom)">
+                    <option :selected="key == $store.app.controls.config" :value="key" x-text="$store.app.getConfigOptionLabel(key)"></option>
+                  </template>
+                </optgroup>
+              </template>
             </select>
-            <template x-if="$store.controls.config.startsWith('simple-consent:config')">
-              <button class="btn btn-secondary btn-icon" data-bs-toggle="tooltip" data-bs-title="Edit Config" @click="$store.configEditor.edit($store.controls.config)" type="button">
-                <sprite-icon symbol="pencil"></sprite-icon>
-              </button>
-            </template>
-            <button class="btn btn-secondary btn-icon" data-bs-toggle="tooltip" data-bs-title="New Config" @click="$store.configEditor.new()" type="button">
+            <button x-show="$store.app.controls.config.startsWith('custom.')" class="btn btn-secondary btn-icon" data-bs-toggle="tooltip" data-bs-title="Edit Config" data-bs-placement="bottom" @click="$store.editor.edit()" type="button">
+              <sprite-icon symbol="pencil"></sprite-icon>
+            </button>
+            <button class="btn btn-secondary btn-icon" data-bs-toggle="tooltip" data-bs-title="New Config" data-bs-placement="bottom" @click="$store.editor.new()" type="button">
               <sprite-icon symbol="plus"></sprite-icon>
             </button>
           </div>
 
           <div class="input-group flex-nowrap w-100 w-md-auto">
-            <label class="input-group-text" for="lang" data-bs-toggle="tooltip" data-bs-title="Locale">
+            <label class="input-group-text" for="lang" data-bs-toggle="tooltip" data-bs-title="Locale" data-bs-placement="bottom">
               <sprite-icon symbol="translate"></sprite-icon>
             </label>
-            <select class="form-select flex-shrink-1" x-model="$store.controls.lang" name="lang" id="lang">
+            <select class="form-select flex-shrink-1" x-model="$store.app.controls.lang" @change="$store.app.changeLang($el.value)" name="lang" id="lang">
               <option value="ar">🇦🇪 Arabic</option>
               <option value="bn">🇧🇩 Bengali</option>
               <option value="zh">🇨🇳 Chinese</option>
@@ -148,22 +150,22 @@ dataLayer = window.dataLayer || [];
           </div>
 
           <div class="input-group flex-nowrap w-md-auto">
-            <label class="input-group-text" for="container_id" data-bs-toggle="tooltip" data-bs-title="Container ID">GTM-</label>
-            <input class="form-control font-monospace" type="text" x-model="$store.controls.containerId" name="container_id" id="container_id" placeholder="PTLD5H79">
+            <label class="input-group-text" for="container_id" data-bs-toggle="tooltip" data-bs-title="Container ID" data-bs-placement="bottom">GTM-</label>
+            <input class="form-control font-monospace" type="text" x-model="$store.app.controls.containerId" name="container_id" id="container_id" placeholder="PTLD5H79">
           </div>
 
         </div>
 
         <div data-testbench-actions class="d-flex align-items-stretch justify-content-between gap-3">
-          <div class="form-check form-switch align-self-center m-0">
+          <div class="d-none d-lg-block form-check form-switch align-self-center m-0">
             <input class="form-check-input" x-model="json_console" type="checkbox" role="switch" name="json_console" id="json_console" checked>
             <label class="form-check-label fw-medium text-muted" for="json_console">Console</label>
           </div>
           <div class="d-flex gap-2 align-self-stretch">
-            <button class="btn btn-secondary btn-icon" type="button" data-bs-toggle="tooltip" data-bs-title="Reset Manager" onclick="SimpleConsent.manager().reset();">
+            <button class="btn btn-secondary btn-icon" type="button" data-bs-toggle="tooltip" data-bs-title="Reset Manager" data-bs-placement="bottom" onclick="SimpleConsent.manager().reset();">
               <sprite-icon symbol="arrow-clockwise"></sprite-icon>
             </button>
-            <button class="btn btn-primary btn-icon" type="submit" data-bs-toggle="tooltip" data-bs-title="Swap Settings">
+            <button class="btn btn-primary btn-icon" type="submit" data-bs-toggle="tooltip" data-bs-title="Swap Settings" data-bs-placement="bottom">
               <sprite-icon symbol="arrow-left-right"></sprite-icon>
             </button>
           </div>
@@ -219,14 +221,14 @@ dataLayer = window.dataLayer || [];
 
     </main>
 
-    <footer data-testbench-footer class="w-100 position-sticky bottom-0 end-0 z-3 d-flex align-items-center justify-content-between bg-white shadow-sm:up p-3 border-top border-secondary-subtle text-muted text-center small">
+    <footer data-testbench-footer x-cloak class="w-100 position-sticky bottom-0 end-0 z-3 d-flex align-items-center justify-content-between bg-white shadow-sm:up p-3 border-top border-secondary-subtle text-muted lh-sm small">
       <a class="d-inline-flex gap-1 align-items-center lh-1 fw-bold text-dark text-decoration-none" href="https://github.com/derekcavaliero/simpleconsent/">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
         </svg>
-        View on GitHub
+        <span><span class="d-none d-lg-inline">View on</span> GitHub</span>
       </a>
-      <div x-data="{year: new Date()}">
+      <div x-data="{year: new Date()}" class="text-end">
         &copy; <template x-if="year.getFullYear() > 2024"><span>2024-</span></template><span x-text="year.getFullYear()"></span> 
         <a class="text-muted" href="https://www.webmechanix.com">WebMechanix</a> 
         a <a class="text-muted" href="https://www.level.agency">Level Agency</a></a>, 
@@ -236,28 +238,28 @@ dataLayer = window.dataLayer || [];
 
   </div>
 
-  <aside data-testbench-console x-cloak :class="{ 'd-none': ! json_console }" class="w-50 flex-shrink-0 vh-100 d-flex flex-column align-items-stretch justify-content-stretch border-end border-2 border-dark" style="background: #282c34;">
+  <aside data-testbench-console :class="{ 'd-lg-none': ! json_console }" class="d-none d-lg-block w-50 flex-shrink-0 vh-100 d-flex flex-column align-items-stretch justify-content-stretch border-end border-2 bg-gray-700 border-dark">
     <div x-data="{label: 'config'}" class="h-50 position-relative overflow-hidden border-bottom border-2 border-dark">
       <div 
         data-ace-editor="config"
         class="m-0 overflow-auto position-absolute w-100 h-100"  
-        x-init="$watch('$store.log.config', () => {
+        x-init="$watch('$store.app.configs.active', () => {
           $nextTick(() => {
-            Alpine.store('log').editors[label].setValue($store.log.json(label), -1);
+            Alpine.store('app').setConsoleValue(label, $store.app.configs.active);
           });
         })"></div>
-        <code class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
+        <code class="position-absolute top-0 end-0 m-3 font-monospace bg-gray-900 fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
     </div>
     <div x-data="{label: 'dataLayer'}" class="h-50 position-relative overflow-hidden border-bottom border-2 border-dark">
       <div 
         data-ace-editor="dataLayer"
         class="m-0 overflow-auto position-absolute w-100 h-100"  
-        x-init="$watch('$store.log.dataLayer', () => {
+        x-init="$watch('$store.app.dataLayer', () => {
           $nextTick(() => {
-            Alpine.store('log').editors[label].setValue($store.log.json(label), -1);
+            Alpine.store('app').setConsoleValue(label, $store.app.dataLayer);
           });
         })"></div>
-      <code class="position-absolute top-0 end-0 m-3 font-monospace bg-dark fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
+      <code class="position-absolute top-0 end-0 m-3 font-monospace bg-gray-900 fw-medium small px-2 py-1 rounded-1" x-text="label"></code>
     </div>
   </aside>
 
@@ -266,36 +268,36 @@ dataLayer = window.dataLayer || [];
     <div class="modal-dialog modal-dialog-centered modal-xl">
       <div class="modal-content bg-dark" style="height: 90vh;">
         <div class="modal-header border-black">
-          <template x-if="$store.configEditor.mode === 'new'">
+          <template x-if="$store.editor.mode === 'new'">
             <h2 class="modal-title h5 fw-bold text-light" id="configEditorHeader">New Config</h2>
           </template>
-          <template x-if="$store.configEditor.mode === 'edit'">
-            <h2 class="modal-title h5 fw-bold text-light" id="configEditorHeader"><code x-text="$store.configEditor.name"></code></h2>
+          <template x-if="$store.editor.mode === 'edit'">
+            <h2 class="modal-title h5 fw-bold text-light" id="configEditorHeader"><code x-text="$store.editor.name"></code></h2>
           </template>
           <button type="button" class="btn-close filter-invert:1" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body position-relative d-flex flex-column bg-editor p-0">
-          <div id="editor" class="w-100 h-100"></div>
-          <input type="hidden" name="config_json" x-model="$store.configEditor.json">
-          <template x-if="$store.configEditor.mode === 'new'">
+          <div data-ace-editor="modalEditor" class="w-100 h-100"></div>
+          <input type="hidden" name="config_json" x-model="$store.editor.json">
+          <template x-if="$store.editor.mode === 'new'">
             <div>
               <hr class="border-1 border-black m-0">
-              <input class="form-control p-3 rounded-0 border-0 bg-transparent focus:none font-monospace small" type="text" name="config_name" x-model="$store.configEditor.name" pattern="[a-zA-Z0-9\- ]{3,}" required placeholder="Enter your config name..." title="Config name may only contain alpha-numeric characters, spaces, and hyphens." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input class="form-control p-3 rounded-0 border-0 bg-transparent focus:none font-monospace small" type="text" name="config_name" x-model="$store.editor.name" pattern="[a-zA-Z0-9\- ]{3,}" required placeholder="Enter your config name..." title="Config name may only contain alpha-numeric characters, spaces, and hyphens." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </template>
-          <template x-if="$store.configEditor.mode === 'edit'">
-            <input type="hidden" name="config_name" x-model="$store.configEditor.name" pattern="[a-zA-Z0-9\- ]{3,}">
+          <template x-if="$store.editor.mode === 'edit'">
+            <input type="hidden" name="config_name" x-model="$store.editor.name" pattern="[a-zA-Z0-9\- ]{3,}">
           </template>
         </div>
         <div class="modal-footer justify-content-start gap-3 border-black">
-          <input type="hidden" name="mode" x-model="$store.configEditor.mode">
+          <input type="hidden" name="mode" x-model="$store.editor.mode">
           <button type="submit" class="btn btn-secondary">Save Config</button>
-          <template x-if="($store.configEditor.mode === 'new') && $store.configEditor.name">
+          <template x-if="($store.editor.mode === 'new') && $store.editor.name">
             <p class="d-flex gap-2 align-items-center text-light m-0">
               <sprite-icon symbol="info-circle-fill"></sprite-icon> 
               <span>
                 Config will be stored in localStorage as:
-                <code class="bg-transparent position-relative" x-text="$store.configEditor.makeConfigKey()"></code>
+                <code class="bg-transparent position-relative" x-text="'simple-consent:' + $store.editor.makeConfigKey()"></code>
               </span>
             </p>
           </template>

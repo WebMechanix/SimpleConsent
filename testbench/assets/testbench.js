@@ -1,129 +1,70 @@
-window._configs = {
-  _: {
+const _Namespace = 'simple-consent:';
+
+const bootManager = () => {
+  
+  const defaultContainerId = 'PTLD5H79';
+
+  const activeConfig = Alpine.store('app').getActiveConfig();
+
+  const overrides = {
     gtm: {
-      containerId: 'GTM-PTLD5H79',
       loadContainer: true,
-    },
-    services: {
-      cloudflare: {
-        name: 'Cloudflare',
-        description: '',
-        types: ['necessary', 'security_storage'],
-      },
-      google_analytics: {
-        name: 'Google Analytics',
-        description: '',
-        types: ['analytics_storage', 'advertising'],
-      },
-      google_ads: {
-        name: 'Google Ads',
-        description: '',
-        types: ['advertising'],
-      },
-      hotjar: {
-        name: 'Hotjar',
-        description: '',
-        types: ['analytics_storage'],
-      },
-      hubspot: {
-        name: 'HubSpot',
-        description: '',
-        types: ['analytics_storage', 'personalization_storage'],
-      },
-      linkedin_ads: {
-        name: 'LinkedIn Ads',
-        description: '',
-        types: ['advertising'],
-      },
-      meta_ads: {
-        name: 'Meta Ads',
-        description: '',
-        types: ['advertising'],
-      },
-      microsoft_ads: {
-        name: 'Microsoft Ads',
-        description: '',
-        types: ['advertising'],
-      },
-      microsoft_clarity: {
-        name: 'Microsoft Clarity',
-        description: '',
-        types: ['analytics_storage'],
-      },
-      tiktok_ads: {
-        name: 'TikTok Ads',
-        description: '',
-        types: ['advertising'],
-      },
-      vwo: {
-        name: 'Visual Website Optimizer',
-        description: '',
-        types: ['analytics_storage'],
-      },
-    },
-    types: {
-      analytics_storage: {
-        name: 'Analytics & Performance',
-        description: 'Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).',
-        gpc: true,
-      },
-      advertising: {
-        name: 'Advertising Targeting & Measurement',
-        description: 'Enables services and services for all advertising purposes. This includes, ad personalization, advertising cookies, user data shared with our advertising partners.',
-        mapTo : ['ad_storage', 'ad_personalization', 'ad_user_data'],
-        gpc: true,
-      },
-      personalization_storage: {
-        name: 'Personalization Storage',
-        description: 'Enables storage and services related to personalization e.g. video recommendations, and account preferences.',
-      },
-      functionality_storage: {
-        name: 'Functional Storage',
-        description: 'Enables storage and services that supports the functionality of the website or app (e.g. language settings).',
-      },
-      security_storage: {
-        name: 'Security Storage',
-        description: 'Enables storage and services related to security such as authentication functionality, fraud prevention, and other user protection.',
-        required: true,
-      }
-    },
-    ui: {
-      placement: {
-        banner: ['bottom', 'center'],
-        settingsButton: ['bottom', 'right'],
-      }
+      containerId: `GTM-${Alpine.store('app').getContainerId() || defaultContainerId}`,
     }
+  };
+
+  const defaultUi = {
+    placement: {
+      banner: ['bottom', 'left'],
+      settingsButton: ['bottom', 'left'],
+    }
+  };
+
+  if (activeConfig.gtm)
+    delete activeConfig.gtm;
+
+  if (activeConfig.ui) {
+    activeConfig.ui.placement = defaultUi.placement;
+  } else {
+    overrides.ui = defaultUi;
   }
-};
 
-const Url = new URL(window.location.href);
-window.configKey = Url.searchParams.get('config') || '_';
-
-if (Url.searchParams.get('lang'))
-  document.documentElement.lang = Url.searchParams.get('lang');
-
-if (Url.searchParams.get('container_id'))
-  window._configs._.gtm.containerId = 'GTM-' + Url.searchParams.get('container_id').toUpperCase();
-
-document.addEventListener('DOMContentLoaded', () => {
-
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-  const header = document.querySelector('header[data-testbench-header]');
-  const main = document.querySelector('main[data-testbench-body]');
-  const footer = document.querySelector('footer[data-testbench-footer]');
-
-  main.style.minHeight = `calc(100vh - (${header.offsetHeight + (footer.offsetHeight)}px)`;
-
-  let config = window._configs[configKey];
-  window._configs[configKey].gtm = window._configs._.gtm;
-  window._configs[configKey].ui = window._configs._.ui;
-  Alpine.store('log').config = config;
+  const config = Object.assign({}, activeConfig, overrides);
 
   new SimpleConsent(config);
 
-});
+};
+
+const clearLog = () => Alpine.store('log').tags = [];
+
+document.addEventListener('simple-consent:destroy', clearLog);
+document.addEventListener('simple-consent:reset', clearLog);
+document.addEventListener('simple-consent:datalayer.push', (e) => Alpine.store('app').updateDataLayer(e.detail) );
+
+const loadCustomConfigs = () => {
+  
+  const items = {};
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith(`${_Namespace}custom.`)) {
+      const config = JSON.parse(localStorage.getItem(key));
+      items[key.replace(_Namespace, '')] = config;
+    }
+  }
+
+  return items;
+
+};
+
+const storeConfig = (key, value) => {
+  localStorage.setItem(`${_Namespace}${key}`, JSON.stringify(value));
+};
+
+function logTag(tag) {
+  const event = new CustomEvent(`cy:gtm.tag.fired`, {detail: tag});
+  document.dispatchEvent(event);
+}
 
 document.addEventListener('submit', (e) => {
   
@@ -138,8 +79,10 @@ document.addEventListener('submit', (e) => {
   let queryParams = new URLSearchParams({
     lang: formData.get('lang'),
     config: formData.get('config'),
-    container_id: formData.get('container_id').toUpperCase(),
   });
+
+  if (formData.get('container_id'))
+    queryParams.set('container_id', formData.get('container_id').toUpperCase());
 
   history.pushState({}, '', `${location.pathname}?${queryParams.toString()}`);
 
@@ -148,37 +91,13 @@ document.addEventListener('submit', (e) => {
   if (formData.get('lang'))
     document.documentElement.lang = formData.get('lang');
 
-  if (formData.get('container_id'))
-    window._configs._.gtm.containerId = 'GTM-' + formData.get('container_id').toUpperCase();
+  Alpine.store('app').setActiveConfig(formData.get('config'));
 
-  configKey = formData.get('config');
+  Alpine.store('app').dataLayer = {};
 
-  window._configs[configKey].gtm = window._configs._.gtm;
-  window._configs[configKey].ui = window._configs._.ui;
-
-  Alpine.store('log').config = window._configs[configKey];
-  Alpine.store('log').dataLayer = {};
-
-  new SimpleConsent(window._configs[configKey]);
+  bootManager();
 
 });
-
-const loadCustomConfigs = () => {
-  
-  const items = [];
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('simple-consent:config.')) {
-      const config = localStorage.getItem(key);
-      window._configs[key] = JSON.parse(config);
-      items.push({ key, config });
-    }
-  }
-
-  return items;
-
-}
 
 document.addEventListener('submit', (e) => {
 
@@ -189,7 +108,6 @@ document.addEventListener('submit', (e) => {
 
   const form = e.target;
   const formData = new FormData(form);
-  const modal = bootstrap.Modal.getInstance(e.target);
 
   const validateJson = (json) => {
     try {
@@ -200,17 +118,10 @@ document.addEventListener('submit', (e) => {
     }
   };
 
-  const configKey = formData.get('config_name').startsWith('simple-consent:config.') ? formData.get('config_name') : Alpine.store('configEditor').makeConfigKey(formData.get('config_name'));
-  const configJson = JSON.stringify(JSON.parse(formData.get('config_json')));
-
-  if (formData.get('mode') === 'new')
-      Alpine.store('controls').addConfig({ key: configKey, config: configJson });
-
-  localStorage.setItem(configKey, configJson);
-
-  modal.hide();
+  const configKey = formData.get('config_name').startsWith(`custom.`) ? formData.get('config_name') : Alpine.store('editor').makeConfigKey(formData.get('config_name'));
+  const configJson = JSON.parse(formData.get('config_json'));
   
-  Alpine.store('configEditor').reset();
+  Alpine.store('editor').save(configKey, configJson);
 
 });
 
@@ -224,20 +135,204 @@ document.addEventListener('click', (e) => {
 
 });
 
-function logTag(tag) {
-  const event = new CustomEvent(`cy:gtm.tag.fired`, {detail: tag});
-  document.dispatchEvent(event);
-}
-
-const reboot = () => Alpine.store('log').tags = [];
-
-document.addEventListener('simple-consent:destroy', reboot);
-document.addEventListener('simple-consent:reset', reboot);
-document.addEventListener('simple-consent:datalayer.push', (e) => Alpine.store('log').updateDataLayer(e.detail) );
-
 document.addEventListener('alpine:init', () => {
 
-  Alpine.store('configEditor', {
+  const Url = new URL(window.location.href);
+
+  Alpine.store('app', {
+    configs: {
+      active: {},
+      custom: loadCustomConfigs(),
+      default: {
+        'Default' : {
+          services: {
+            cloudflare: {
+              name: 'Cloudflare',
+              description: '',
+              types: ['necessary', 'security_storage'],
+            },
+            google_analytics: {
+              name: 'Google Analytics',
+              description: '',
+              types: ['analytics_storage', 'advertising'],
+            },
+            google_ads: {
+              name: 'Google Ads',
+              description: '',
+              types: ['advertising'],
+            },
+            hotjar: {
+              name: 'Hotjar',
+              description: '',
+              types: ['analytics_storage'],
+            },
+            hubspot: {
+              name: 'HubSpot',
+              description: '',
+              types: ['analytics_storage', 'personalization_storage'],
+            },
+            linkedin_ads: {
+              name: 'LinkedIn Ads',
+              description: '',
+              types: ['advertising'],
+            },
+            meta_ads: {
+              name: 'Meta Ads',
+              description: '',
+              types: ['advertising'],
+            },
+            microsoft_ads: {
+              name: 'Microsoft Ads',
+              description: '',
+              types: ['advertising'],
+            },
+            microsoft_clarity: {
+              name: 'Microsoft Clarity',
+              description: '',
+              types: ['analytics_storage'],
+            },
+            tiktok_ads: {
+              name: 'TikTok Ads',
+              description: '',
+              types: ['advertising'],
+            },
+            vwo: {
+              name: 'Visual Website Optimizer',
+              description: '',
+              types: ['analytics_storage'],
+            },
+          },
+          types: {
+            analytics_storage: {
+              name: 'Analytics & Performance',
+              description: 'Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).',
+              gpc: true,
+            },
+            advertising: {
+              name: 'Advertising Targeting & Measurement',
+              description: 'Enables services and services for all advertising purposes. This includes, ad personalization, advertising cookies, user data shared with our advertising partners.',
+              mapTo : ['ad_storage', 'ad_personalization', 'ad_user_data'],
+              gpc: true,
+            },
+            personalization_storage: {
+              name: 'Personalization Storage',
+              description: 'Enables storage and services related to personalization e.g. video recommendations, and account preferences.',
+            },
+            functionality_storage: {
+              name: 'Functional Storage',
+              description: 'Enables storage and services that supports the functionality of the website or app (e.g. language settings).',
+            },
+            security_storage: {
+              name: 'Security Storage',
+              description: 'Enables storage and services related to security such as authentication functionality, fraud prevention, and other user protection.',
+              required: true,
+            }
+          }
+        }
+      },
+    },
+    dataLayer: {},
+    console: {
+      config: null,
+      dataLayer: null,
+    },
+    controls: {
+      lang: Url.searchParams.get('lang') || 'en',
+      config: Url.searchParams.get('config') || 'Default',
+      containerId: Url.searchParams.get('container_id') || '',
+    },
+    boot() {
+
+      if (Url.searchParams.get('lang'))
+        document.documentElement.lang = Url.searchParams.get('lang');
+
+      this.setActiveConfig(Url.searchParams.get('config') || 'Default');
+
+      [
+        'config',
+        'dataLayer',
+      ].forEach(key => {
+
+        this.console[key] = ace.edit(document.querySelector(`[data-ace-editor="${key}"]`));
+        // this.console.editors[key].setValue(this.json(key), -1);
+
+        if (key === 'config')
+          this.console[key].setValue(JSON.stringify(this.getActiveConfig(), null, 2), -1);
+
+        if (key === 'dataLayer')
+          this.console[key].setValue(JSON.stringify(this.dataLayer, null, 2), -1);
+
+        this.console[key].setTheme('ace/theme/one_dark');
+        this.console[key].setShowPrintMargin(false);
+        this.console[key].setReadOnly(true);
+        this.console[key].container.style.lineHeight = "1.4";
+        this.console[key].session.setTabSize(2);
+        this.console[key].session.setUseWrapMode(true);
+        this.console[key].session.setMode('ace/mode/json');
+
+        this.console[key].renderer.setScrollMargin(16, 16);
+        this.console[key].renderer.on('afterRender', function() {
+          document.querySelector(`[data-ace-editor="${key}"]`).classList.add('is-loaded');
+        });
+
+      });
+
+    },
+    changeConfig(value) {
+      this.setActiveConfig(value);
+      SimpleConsent.manager().destroy();
+      bootManager();
+      // this.setConsoleValue('config', this.getActiveConfig());
+    },
+    changeLang(value) {
+      document.documentElement.lang = value;
+      SimpleConsent.manager().destroy();
+      bootManager();
+      // this.setConsoleValue('config', this.getActiveConfig());
+    },
+    getActiveConfig() {
+      return this.configs.active;
+    },
+    setActiveConfig(configKey) {
+      this.configs.active = (configKey.startsWith('custom.')) ? this.configs.custom[configKey] : this.configs.default[configKey];
+    },
+    getConfig(configKey) {
+     
+      if (configKey.startsWith('custom.'))
+        return this.configs.custom[configKey];
+
+      return this.configs.default[configKey];
+
+    },
+    getConfigOptionLabel(key) {
+      return key.replace(`custom.`, '');
+    },
+    getContainerId() {
+      return this.controls.containerId.replace('GTM-', '').toUpperCase();
+    },
+    setConsoleValue(key, value) {
+      this.console[key].setValue(JSON.stringify(value, null, 2), -1);
+    },
+    setControl(key, value) {
+      this.controls[key] = value;
+    },
+    updateDataLayer(data) {
+      this.dataLayer = data;
+    },
+    upsertConfig(key, value) {
+
+      this.configs.custom[key] = value;
+      storeConfig(key, value);        
+
+      this.setControl('config', key);
+      this.setActiveConfig(key);
+
+      bootManager();
+
+    }
+  });
+
+  Alpine.store('editor', {
     editor: null,
     errors: {
       json: null,
@@ -247,8 +342,8 @@ document.addEventListener('alpine:init', () => {
     modal: new bootstrap.Modal(document.querySelector('[data-testbench-config-editor]')),
     mode: 'new',
     name: '',
-    bootEditor() {
-      this.editor = ace.edit('editor');
+    boot() {
+      this.editor = ace.edit(document.querySelector('[data-ace-editor="modalEditor"]'));
 
       this.editor.setValue("{\n\t\n}", -1);
       
@@ -259,26 +354,33 @@ document.addEventListener('alpine:init', () => {
       this.editor.setTheme('ace/theme/one_dark');
       this.editor.setShowPrintMargin(false);
       this.editor.renderer.setScrollMargin(16, 16);
+      this.editor.container.style.lineHeight = "1.4";
       this.editor.session.setTabSize(2);
       this.editor.session.setUseWrapMode(true);
       this.editor.session.setMode('ace/mode/json');
+    },
+    edit(configKey) {
+      this.name = configKey;
+      this.mode = 'edit';
+      this.json = Alpine.store('app').getActiveConfig();
+      this.editor.setValue(JSON.stringify(this.json, null, 2), -1);
+      this.modal.show();
+    },
+    save(configKey, configJson) {
+      Alpine.store('app').upsertConfig(configKey, configJson);
+      this.modal.hide();
+      this.reset();
     },
     makeConfigKey(str) {
 
       if (! str)
         str = this.name;
 
-      return `simple-consent:config.${str.toLowerCase().replace(/[^a-z0-9\-]/g, '-')}`;
+      return `custom.${str.toLowerCase().replace(/[^a-z0-9\-]/g, '-')}`;
 
     },
     new() {
-      this.modal.show();
-    },
-    edit(configKey) {
-      this.name = configKey;
-      this.mode = 'edit';
-      this.json = Alpine.store('controls').getConfig(configKey);
-      this.editor.setValue(JSON.stringify(this.json, null, 2), -1);
+      this.reset();
       this.modal.show();
     },
     reset() {
@@ -290,53 +392,9 @@ document.addEventListener('alpine:init', () => {
     }
   });
 
-  Alpine.store('configEditor').bootEditor();
-
-  Alpine.store('controls', {
-    lang: Url.searchParams.get('lang') || 'en',
-    config: Url.searchParams.get('config') || '_',
-    customConfigs: loadCustomConfigs(),
-    containerId: Url.searchParams.get('container_id') || '',
-    addConfig(config) {
-      this.customConfigs.push(config);
-    },
-    getConfig(configKey) {
-      return window._configs[configKey];
-    },
-    getConfigOptionLabel(config) {
-      return config.key.replace('simple-consent:config.', '');
-    },
-    loadConfig(configKey) {},
-  });
-
   Alpine.store('log', {
-    config: {},
-    dataLayer: {},
-    editors: {
-      config: null,
-      dataLayer: null,
-    },
     tags: [],
     updatedTags: new Set(),
-    bootEditors() {
-
-      [
-        'config',
-        'dataLayer',
-      ].forEach(key => {
-
-        this.editors[key] = ace.edit(document.querySelector(`[data-ace-editor="${key}"]`));
-        this.editors[key].setTheme('ace/theme/one_dark');
-        this.editors[key].setShowPrintMargin(false);
-        this.editors[key].setReadOnly(true);
-        this.editors[key].renderer.setScrollMargin(16, 16);
-        this.editors[key].session.setTabSize(2);
-        this.editors[key].session.setUseWrapMode(true);
-        this.editors[key].session.setMode('ace/mode/json');
-
-      });
-
-    },
     addTag(tag) {
       tag.totalFired = 1;
       tag.triggerEvent = [tag.triggerEvent];
@@ -358,16 +416,11 @@ document.addEventListener('alpine:init', () => {
     },
     findTag(key) {
       return this.tags.find(tag => tag.key === key);
-    },
-    json(key) {
-      return JSON.stringify(this[key], null, 2);
-    },
-    updateDataLayer(data) {
-      this.dataLayer = data;
-    },
+    }
   }); 
 
-  Alpine.store('log').bootEditors();
+  Alpine.store('app').boot();
+  Alpine.store('editor').boot();
 
   document.addEventListener('cy:gtm.tag.fired', (event) => {
 
@@ -377,5 +430,20 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('log').addOrUpdateTag(event.detail);
 
   });
+
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+  const header = document.querySelector('header[data-testbench-header]');
+  const main = document.querySelector('main[data-testbench-body]');
+  const footer = document.querySelector('footer[data-testbench-footer]');
+
+  main.style.minHeight = `calc(100vh - (${header.offsetHeight + (footer.offsetHeight)}px)`;
+
+  bootManager();
 
 });
