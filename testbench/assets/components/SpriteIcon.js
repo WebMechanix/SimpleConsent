@@ -24,7 +24,7 @@ export class SpriteIcon extends HTMLElement {
 
     this.outerHTML = `
       <svg class="${this.className}">
-        <use xlink:href="${this.sprite}?cachebust=${(new Date()).getTime()}#${this.symbol}"></use>
+        <use xlink:href="${this.sprite}#${this.symbol}"></use>
       </svg>
     `;
 
