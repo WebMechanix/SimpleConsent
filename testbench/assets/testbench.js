@@ -33,6 +33,8 @@ const bootManager = () => {
 
   new SimpleConsent(config);
 
+  Alpine.store('app').configs.resolved = SimpleConsent.manager().config;
+
 };
 
 const clearLog = () => Alpine.store('log').tags = [];
@@ -40,6 +42,7 @@ const clearLog = () => Alpine.store('log').tags = [];
 document.addEventListener('simple-consent:destroy', clearLog);
 document.addEventListener('simple-consent:reset', clearLog);
 document.addEventListener('simple-consent:datalayer.push', (e) => Alpine.store('app').updateDataLayer(e.detail) );
+
 
 const loadCustomConfigs = () => {
   
@@ -81,20 +84,18 @@ document.addEventListener('submit', (e) => {
     config: formData.get('config'),
   });
 
+  if (formData.get('lang'))
+    document.documentElement.lang = formData.get('lang');
+
   if (formData.get('container_id'))
     queryParams.set('container_id', formData.get('container_id').toUpperCase());
 
   history.pushState({}, '', `${location.pathname}?${queryParams.toString()}`);
 
-  SimpleConsent.manager().destroy();
-
-  if (formData.get('lang'))
-    document.documentElement.lang = formData.get('lang');
-
   Alpine.store('app').setActiveConfig(formData.get('config'));
-
   Alpine.store('app').dataLayer = {};
 
+  SimpleConsent.manager().destroy();
   bootManager();
 
 });
@@ -145,6 +146,332 @@ document.addEventListener('alpine:init', () => {
       custom: loadCustomConfigs(),
       default: {
         'Default' : {
+          l10n: {
+            "de": {
+              content: {
+                banner: {
+                  heading: 'Datenschutzhinweis',
+                  description: 'Diese Website verwendet Cookies (oder andere Browser-Speichermöglichkeiten), um unsere Dienste bereitzustellen und/oder die Nutzung unserer Website zu analysieren. Diese Informationen werden auch durch die Verwendung von Tracking-Skripten/Pixeln mit Werbepartnern geteilt.',
+                  actions: {
+                    acceptAll: 'Alle akzeptieren',
+                    denyAll: 'Alle ablehnen',
+                    showSettings: 'Einstellungen bearbeiten'
+                  }
+                },
+                notices: {
+                  required: {
+                    badge: 'Immer aktiviert'
+                  },
+                  gpc: {
+                    badge: 'Durch GPC deaktiviert',
+                    heading: 'Globale Datenschutzkontrolle (GPC)',
+                    description: 'Einige Dienste wurden deaktiviert, um Ihr Opt-out-Signal zu respektieren.'
+                  }
+                },
+                modal: {
+                  heading: 'Ihre Datenschutzoptionen',
+                  description: 'Diese Website verwendet Dienste, die Speicherfunktionen in Ihrem Browser (über Cookies oder andere Browser-Speicherfunktionen) nutzen, um Informationen zu sammeln. Sie können bestimmte Arten der Datenerfassung mit den folgenden Steuerungsmöglichkeiten genehmigen oder ablehnen.',
+                  toggleAll: 'Alle aktivieren/deaktivieren',
+                  actions: {
+                    acceptAll: 'Alle akzeptieren',
+                    acceptSelected: 'Ausgewählte akzeptieren',
+                    denyAll: 'Alle ablehnen',
+                    saveSettings: 'Einstellungen speichern'
+                  }
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Datenschutzrichtlinie',
+                    url: '#/privacy-policy'
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Cookie-Richtlinie',
+                    url: '#/cookie-policy'
+                  }
+                }
+              }
+            },
+            "es": {
+              content: {
+                banner: {
+                  heading: 'Aviso de privacidad',
+                  description: 'Este sitio web utiliza cookies (u otro almacenamiento del navegador) para ofrecer nuestros servicios y/o analizar el uso de nuestro sitio web. Esta información también se comparte con socios publicitarios mediante el uso de scripts/píxeles de seguimiento.',
+                  actions: {
+                    acceptAll: 'Aceptar todo',
+                    denyAll: 'Rechazar todo',
+                    showSettings: 'Editar preferencias'
+                  }
+                },
+                notices: {
+                  required: {
+                    badge: 'Siempre activado'
+                  },
+                  gpc: {
+                    badge: 'Desactivado por GPC',
+                    heading: 'Control de Privacidad Global (GPC)',
+                    description: 'Algunos servicios han sido desactivados para respetar su señal de exclusión.'
+                  }
+                },
+                modal: {
+                  heading: 'Sus opciones de privacidad',
+                  description: 'Este sitio web utiliza servicios que emplean funciones de almacenamiento en su navegador (a través de cookies u otras funcionalidades de almacenamiento del navegador) para recopilar información. Puede elegir conceder o denegar ciertos tipos de recopilación de datos utilizando los controles a continuación.',
+                  toggleAll: 'Activar/Desactivar todo',
+                  actions: {
+                    acceptAll: 'Aceptar todo',
+                    acceptSelected: 'Aceptar seleccionados',
+                    denyAll: 'Rechazar todo',
+                    saveSettings: 'Guardar preferencias'
+                  }
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Política de privacidad',
+                    url: '#/privacy-policy'
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Política de cookies',
+                    url: '#/cookie-policy'
+                  }
+                }
+              }
+            },
+            "fr": {
+              content: {
+                banner: {
+                  heading: '🍪 & Confidentialité',
+                  description: 'Nous utilisons des cookies pour offrir la meilleure expérience. En cliquant sur "Accepter", vous acceptez l\'utilisation des cookies.',
+                  actions: {
+                    showSettings: 'Préférences',
+                    acceptAll: 'Accepter',
+                    denyAll: 'Refuser',
+                  },
+                },
+                modal: {
+                  heading: 'Préférences de confidentialité',
+                  description: 'Ceci est un aperçu des cookies que nous utilisons. Vous pouvez choisir les cookies que vous souhaitez accepter.',
+                  actions: {
+                    acceptAll: 'Tout accepter',
+                    acceptSelected: 'Accepter la sélection',
+                    saveSettings: 'Sauvegarder',
+                    denyAll: 'Tout refuser',
+                  },
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Politique de confidentialité',
+                  },
+                  cookiePolicy: {
+                    text: 'Politique de cookies',
+                  },
+                }
+              },
+              services: {},
+              types: {
+                necessary: {
+                  name: 'Nécessaire',
+                  description: 'Les cookies nécessaires permettent des fonctionnalités de base telles que la navigation de page et l\'accès aux zones sécurisées du site Web. Le site Web ne peut pas fonctionner correctement sans ces cookies.',
+                },
+                analytics_storage: {
+                  name: 'Analyse & Performance',
+                  description: 'Active le stockage et les services qui sont utilisés pour mesurer les visites, les sessions et certains types d\'activité en page (comme les clics sur les boutons).',
+                },
+                advertising: {
+                  name: 'Publicité Ciblage & Mesure',
+                  description: 'Active les services et services à toutes fins publicitaires. Cela inclut, la personnalisation des annonces, les cookies publicitaires, les données utilisateur partagées avec nos partenaires publicitaires.',
+                },
+                personalization_storage: {
+                  name: 'Stockage de personnalisation',
+                  description: 'Active le stockage et les services liés à la personnalisation, par exemple les recommandations vidéo et les préférences de compte.',
+                },
+                functionality_storage: {
+                  name: 'Stockage fonctionnel',
+                  description: 'Active le stockage et les services qui prennent en charge la fonctionnalité du site Web ou de l\'application (par exemple, les paramètres de langue).',
+                },
+                security_storage: {
+                  name: 'Stockage de sécurité',
+                  description: 'Active le stockage et les services liés à la sécurité tels que la fonctionnalité d\'authentification, la prévention de la fraude et d\'autres protections des utilisateurs.'
+                }
+              },
+            },
+            "pt-br": {
+              content: {
+                banner: {
+                  heading: 'Aviso de Privacidade',
+                  description: 'Este site usa cookies (ou outro armazenamento do navegador) para fornecer nossos serviços e/ou analisar o uso do nosso site. Essas informações também são compartilhadas com parceiros de publicidade através do uso de scripts/pixels de rastreamento.',
+                  actions: {
+                    acceptAll: 'Aceitar Tudo',
+                    denyAll: 'Recusar Tudo',
+                    showSettings: 'Editar Preferências',
+                  },
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Política de Privacidade',
+                    url: '#/privacy-policy',
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Política de Cookies',
+                    url: '#/cookie-policy',
+                  },
+                },
+                modal: {
+                  heading: 'Suas Escolhas de Privacidade',
+                  description: 'Este site usa serviços que utilizam recursos de armazenamento no seu navegador (via cookies ou outras funcionalidades de armazenamento do navegador) para coletar informações. Você pode escolher permitir ou negar certos tipos de coleta de dados usando os controles abaixo.',
+                  toggleAll: 'Ativar/Desativar Tudo',
+                  actions: {
+                    acceptAll: 'Aceitar Tudo',
+                    acceptSelected: 'Aceitar Selecionados',
+                    denyAll: 'Recusar Tudo',
+                    saveSettings: 'Salvar Preferências',
+                  },
+                },
+                notices: {
+                  required: {
+                    badge: 'Sempre Ativo',
+                  },
+                  gpc: {
+                    badge: 'Desativado pelo GPC',
+                    description: 'Alguns serviços foram automaticamente desativados para respeitar seu sinal de opção de exclusão do Global Privacy Control.',
+                  },
+                },
+              }
+            },
+            "pt-pt": {
+              content: {
+                banner: {
+                  heading: 'Aviso de Privacidade',
+                  description: 'Este site utiliza cookies (ou outro armazenamento do navegador) para fornecer os nossos serviços e/ou analisar a utilização do nosso site. Esta informação também é partilhada com parceiros publicitários através do uso de scripts/pixels de rastreamento.',
+                  actions: {
+                    acceptAll: 'Aceitar Tudo',
+                    denyAll: 'Recusar Tudo',
+                    showSettings: 'Editar Preferências',
+                  },
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Política de Privacidade',
+                    url: '#/privacy-policy',
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Política de Cookies',
+                    url: '#/cookie-policy',
+                  },
+                },
+                modal: {
+                  heading: 'As Suas Escolhas de Privacidade',
+                  description: 'Este site utiliza serviços que usam recursos de armazenamento no seu navegador (via cookies ou outras funcionalidades de armazenamento do navegador) para recolher informações. Pode escolher conceder ou negar certos tipos de recolha de dados utilizando os controlos abaixo.',
+                  toggleAll: 'Ativar/Desativar Tudo',
+                  actions: {
+                    acceptAll: 'Aceitar Tudo',
+                    acceptSelected: 'Aceitar Selecionados',
+                    denyAll: 'Recusar Tudo',
+                    saveSettings: 'Guardar Preferências',
+                  },
+                },
+                notices: {
+                  required: {
+                    badge: 'Sempre Ativo',
+                  },
+                  gpc: {
+                    badge: 'Desativado pelo GPC',
+                    description: 'Alguns serviços foram automaticamente desativados para respeitar o seu sinal de opção de exclusão do Global Privacy Control.',
+                  },
+                },
+              }
+            },
+            "tr": {
+              content: {
+                banner: {
+                  heading: 'Gizlilik Bildirimi',
+                  description: 'Bu web sitesi, hizmetlerimizi sunmak ve/veya web sitesi kullanımımızı analiz etmek için çerezleri (veya diğer tarayıcı depolama özelliklerini) kullanır. Bu bilgiler ayrıca izleme komut dosyaları/pikselleri kullanılarak reklam ortaklarıyla paylaşılır.',
+                  actions: {
+                    acceptAll: 'Tümünü Kabul Et',
+                    denyAll: 'Tümünü Reddet',
+                    showSettings: 'Tercihleri Düzenle',
+                  },
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Gizlilik Politikası',
+                    url: '#/privacy-policy',
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Çerez Politikası',
+                    url: '#/cookie-policy',
+                  },
+                },
+                modal: {
+                  heading: 'Gizlilik Tercihleriniz',
+                  description: 'Bu web sitesi, bilgi toplamak için tarayıcınızdaki depolama özelliklerini (çerezler veya diğer tarayıcı depolama işlevselliği aracılığıyla) kullanan hizmetlerden yararlanır. Aşağıdaki kontrolleri kullanarak belirli veri toplama türlerine izin verebilir veya reddedebilirsiniz.',
+                  toggleAll: 'Tümünü Etkinleştir/Devre Dışı Bırak',
+                  actions: {
+                    acceptAll: 'Tümünü Kabul Et',
+                    acceptSelected: 'Seçilenleri Kabul Et',
+                    denyAll: 'Tümünü Reddet',
+                    saveSettings: 'Tercihleri Kaydet',
+                  },
+                },
+                notices: {
+                  required: {
+                    badge: 'Her Zaman Etkin',
+                  },
+                  gpc: {
+                    badge: 'GPC Tarafından Devre Dışı Bırakıldı',
+                    description: 'Bazı hizmetler, Global Privacy Control devre dışı bırakma sinyalinize saygı göstermek için otomatik olarak devre dışı bırakılmıştır.',
+                  },
+                },
+              }
+            },
+            "ru": {
+              content: {
+                banner: {
+                  heading: 'Уведомление о конфиденциальности',
+                  description: 'Этот веб-сайт использует файлы cookie (или другие средства хранения браузера) для предоставления наших услуг и/или анализа использования нашего веб-сайта. Эта информация также передается рекламным партнерам через использование скриптов/пикселей отслеживания.',
+                  actions: {
+                    acceptAll: 'Принять все',
+                    denyAll: 'Отклонить все',
+                    showSettings: 'Изменить настройки',
+                  },
+                },
+                links: {
+                  privacyPolicy: {
+                    text: 'Политика конфиденциальности',
+                    url: '#/privacy-policy',
+                  },
+                  termsOfService: null,
+                  cookiePolicy: {
+                    text: 'Политика использования файлов cookie',
+                    url: '#/cookie-policy',
+                  },
+                },
+                modal: {
+                  heading: 'Ваши настройки конфиденциальности',
+                  description: 'Этот веб-сайт использует сервисы, которые используют функции хранения в вашем браузере (через файлы cookie или другие функции хранения браузера) для сбора информации. Вы можете выбрать, разрешить или запретить определенные типы сбора данных, используя элементы управления ниже.',
+                  toggleAll: 'Включить/Отключить все',
+                  actions: {
+                    acceptAll: 'Принять все',
+                    acceptSelected: 'Принять выбранное',
+                    denyAll: 'Отклонить все',
+                    saveSettings: 'Сохранить настройки',
+                  },
+                },
+                notices: {
+                  required: {
+                    badge: 'Всегда включено',
+                  },
+                  gpc: {
+                    badge: 'Отключено GPC',
+                    description: 'Некоторые сервисы были автоматически отключены в соответствии с вашим сигналом Global Privacy Control об отказе.',
+                  },
+                },
+              }
+            }
+          },
           services: {
             cloudflare: {
               name: 'Cloudflare',
@@ -230,6 +557,7 @@ document.addEventListener('alpine:init', () => {
           }
         }
       },
+      resolved: {}
     },
     dataLayer: {},
     console: {
@@ -253,8 +581,20 @@ document.addEventListener('alpine:init', () => {
         'dataLayer',
       ].forEach(key => {
 
-        this.console[key] = ace.edit(document.querySelector(`[data-ace-editor="${key}"]`));
-        // this.console.editors[key].setValue(this.json(key), -1);
+        this.console[key] = ace.edit(document.querySelector(`[data-ace-editor="${key}"]`), {
+          mode: 'ace/mode/json',
+          readOnly: true,
+          showPrintMargin: false,
+          tabSize: 2,
+          theme: 'ace/theme/one_dark',
+          wrap: true
+        });
+        
+        this.console[key].container.style.lineHeight = "1.4";
+        this.console[key].renderer.setScrollMargin(16, 16);
+        this.console[key].renderer.on('afterRender', function() {
+          document.querySelector(`[data-ace-editor="${key}"]`).classList.add('is-loaded');
+        });
 
         if (key === 'config')
           this.console[key].setValue(JSON.stringify(this.getActiveConfig(), null, 2), -1);
@@ -262,36 +602,26 @@ document.addEventListener('alpine:init', () => {
         if (key === 'dataLayer')
           this.console[key].setValue(JSON.stringify(this.dataLayer, null, 2), -1);
 
-        this.console[key].setTheme('ace/theme/one_dark');
-        this.console[key].setShowPrintMargin(false);
-        this.console[key].setReadOnly(true);
-        this.console[key].container.style.lineHeight = "1.4";
-        this.console[key].session.setTabSize(2);
-        this.console[key].session.setUseWrapMode(true);
-        this.console[key].session.setMode('ace/mode/json');
-
-        this.console[key].renderer.setScrollMargin(16, 16);
-        this.console[key].renderer.on('afterRender', function() {
-          document.querySelector(`[data-ace-editor="${key}"]`).classList.add('is-loaded');
-        });
-
       });
 
     },
     changeConfig(value) {
       this.setActiveConfig(value);
+      this.updateUrl('config', value);
       SimpleConsent.manager().destroy();
       bootManager();
-      // this.setConsoleValue('config', this.getActiveConfig());
     },
     changeLang(value) {
       document.documentElement.lang = value;
+      this.updateUrl('lang', value);
       SimpleConsent.manager().destroy();
       bootManager();
-      // this.setConsoleValue('config', this.getActiveConfig());
     },
     getActiveConfig() {
       return this.configs.active;
+    },
+    getResolvedConfig() {
+      return this.configs.resolved;
     },
     setActiveConfig(configKey) {
       this.configs.active = (configKey.startsWith('custom.')) ? this.configs.custom[configKey] : this.configs.default[configKey];
@@ -310,11 +640,26 @@ document.addEventListener('alpine:init', () => {
     getContainerId() {
       return this.controls.containerId.replace('GTM-', '').toUpperCase();
     },
+    removeConfig(key) {
+      
+      delete this.configs.custom[key];
+      localStorage.removeItem(`${_Namespace}${key}`);
+      
+      updateUrl('config', 'Default');
+      this.setActiveConfig('Default');
+
+      Alpine.store('editor').reset();
+      Alpine.store('editor').modal.hide();
+
+      bootManager();
+
+    },
     setConsoleValue(key, value) {
       this.console[key].setValue(JSON.stringify(value, null, 2), -1);
     },
     setControl(key, value) {
       this.controls[key] = value;
+      this.updateUrl(key, value);
     },
     updateDataLayer(data) {
       this.dataLayer = data;
@@ -324,11 +669,16 @@ document.addEventListener('alpine:init', () => {
       this.configs.custom[key] = value;
       storeConfig(key, value);        
 
-      this.setControl('config', key);
       this.setActiveConfig(key);
+      this.setControl('config', key);
 
       bootManager();
 
+    },
+    updateUrl(key, value) {
+      const Url = new URL(window.location.href);
+      Url.searchParams.set(key, value);
+      history.pushState({}, '', Url.toString());
     }
   });
 
@@ -343,26 +693,28 @@ document.addEventListener('alpine:init', () => {
     mode: 'new',
     name: '',
     boot() {
-      this.editor = ace.edit(document.querySelector('[data-ace-editor="modalEditor"]'));
 
-      this.editor.setValue("{\n\t\n}", -1);
-      
+      this.editor = ace.edit(document.querySelector('[data-ace-editor="modalEditor"]'), {
+        mode: 'ace/mode/json',
+        showPrintMargin: false,
+        tabSize: 2,
+        theme: 'ace/theme/one_dark',
+        value: "{\n\t\n}",
+        wrap: true
+      });
+
+      this.editor.container.style.lineHeight = "1.4";
+      this.editor.renderer.setScrollMargin(16, 16);
       this.editor.session.on("change", () => {
         this.json = this.editor.getValue();
       });
     
-      this.editor.setTheme('ace/theme/one_dark');
-      this.editor.setShowPrintMargin(false);
-      this.editor.renderer.setScrollMargin(16, 16);
-      this.editor.container.style.lineHeight = "1.4";
-      this.editor.session.setTabSize(2);
-      this.editor.session.setUseWrapMode(true);
-      this.editor.session.setMode('ace/mode/json');
     },
-    edit(configKey) {
+    edit() {
+      const configKey = Alpine.store('app').controls.config;
       this.name = configKey;
       this.mode = 'edit';
-      this.json = Alpine.store('app').getActiveConfig();
+      this.json = Alpine.store('app').getConfig(configKey);
       this.editor.setValue(JSON.stringify(this.json, null, 2), -1);
       this.modal.show();
     },

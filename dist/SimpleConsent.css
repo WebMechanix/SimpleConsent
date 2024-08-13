@@ -11,7 +11,7 @@
 
   --consent-background-color: #fff;
   --consent-banner-heading-font-size: 1.25rem;
-  --consent-banner-max-width: 30rem; /* ~460px */
+  --consent-banner-max-width: 29.5rem; /* ~460px */
   --consent-banner-offset: 0.75rem;
 
   --consent-border: 1px solid rgba(0, 0, 0, 0.175);

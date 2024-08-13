@@ -931,6 +931,7 @@ class SimpleConsent {
 
     let payload = {
       event: `${this.#_namespace}:${dataLayerEvent}`,
+      consent: consentStatus,
       consentMeta: {
         model: this.#config.consentModel,
         geo: this.#_geo,
@@ -938,7 +939,7 @@ class SimpleConsent {
       },
     };
 
-    payload = Object.assign(payload, consentStatus);
+    // payload = Object.assign(payload, consentStatus);
 
     window.dataLayer.push(payload);
 
