@@ -1,6 +1,6 @@
 {
-    "/dist/SimpleConsent.min.css": "/dist/SimpleConsent.min.css",
     "/dist/SimpleConsent.js": "/dist/SimpleConsent.js",
     "/dist/SimpleConsent.css": "/dist/SimpleConsent.css",
-    "/dist/SimpleConsent.min.js": "/dist/SimpleConsent.min.js"
+    "/testbench/assets/SimpleConsent.js": "/testbench/assets/SimpleConsent.js",
+    "/testbench/assets/SimpleConsent.css": "/testbench/assets/SimpleConsent.css"
 }

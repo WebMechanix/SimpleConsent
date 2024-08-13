@@ -18,7 +18,9 @@ mix.options({
 });
 
 mix.copy(`src/${library}.js`, `dist/${library}.js`)
-  .copy(`src/${library}.css`, `dist/${library}.css`);
+  .copy(`src/${library}.css`, `dist/${library}.css`)
+  .copy(`src/${library}.js`, `testbench/assets/${library}.js`)
+  .copy(`src/${library}.css`, `testbench/assets/${library}.css`);
 
 if (mix.inProduction()) {
   mix.minify(`src/${library}.js`, `dist/${library}.min.js`)
