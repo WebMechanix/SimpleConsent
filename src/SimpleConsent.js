@@ -703,7 +703,7 @@ class SimpleConsent {
       if (e.key !== 'Escape') 
         return;
 
-      if (this.#ui.modal && this.#ui.modal.classList.contains('is-open'))
+      if (this.#ui.modal && this.#ui.modal.hasAttribute('aria-expanded'))
         this.#ui.modal.querySelector('[data-consent-close]').click();
 
     });
@@ -860,7 +860,7 @@ class SimpleConsent {
 
     this.#emit(`${element.dataset.consentTpl}.close.before`, element);
 
-    element.classList.remove('is-open');
+    element.removeAttribute('aria-expanded');
 
     this.#emit(`${element.dataset.consentTpl}.close.after`, element);
 
@@ -1052,13 +1052,12 @@ class SimpleConsent {
    */
   #mount() {
 
+    this.#mountStyles();
+
     const root = document.createElement('div');
     root.id = this.#config.ui.rootId;
     
     root.className = this.#config.ui.rootClass;
-    this.#bulkSetAttributes(root, { 
-      'data-consent-tpl': 'root',
-    });
 
     // Modal
     this.#ui.modal = this.#parseTemplate('modal', this.#config.content.modal);
@@ -1076,6 +1075,7 @@ class SimpleConsent {
     this.#mountActions(this.#ui.banner);
     
     this.#bulkSetAttributes(this.#ui.banner, { 
+      'role': 'alert',
       'data-consent-placement': this.#config.ui.placement.banner.join(','),
     });
 
@@ -1098,6 +1098,7 @@ class SimpleConsent {
 
     this.#ui.settingsButton = this.#parseTemplate('settingsButton', {});
     this.#bulkSetAttributes(this.#ui.settingsButton, { 
+      'role': 'dialog',
       'data-consent-tpl': 'settingsButton',
       'data-consent-action': 'showSettings',
       'data-consent-placement': this.#config.ui.placement.settingsButton.join(','),
@@ -1232,6 +1233,27 @@ class SimpleConsent {
       }
 
     }
+  }
+
+  #mountStyles() {
+
+    const styleId = `${this.#_namespace}-styles`;
+    let styles = document.getElementById(styleId);
+
+    if (styles)
+      return;
+
+    styles = document.createElement('style');
+    styles.id = styleId;
+    
+    styles.textContent = `
+      [data-consent-tpl][role] { display: none; }
+      [data-consent-tpl][role][aria-expanded] { display: flex !important; }
+      [data-consent-tpl][role][aria-expanded] ~ [aria-expanded] { display: none !important; }
+    `;
+    
+    document.head.appendChild(styles);
+
   }
 
   /**
@@ -1376,7 +1398,7 @@ class SimpleConsent {
     if (this.#config.consentRequired && ! this.#settings)
       return;
 
-    this.#ui[uiKey].classList.remove('is-open');
+    this.#ui[uiKey].removeAttribute('aria-expanded');
 
   }
 
@@ -1453,7 +1475,7 @@ class SimpleConsent {
   show(uiKey = 'modal') {
 
     this.#emit(`${uiKey}.show.before`, this.#ui[uiKey]);
-    this.#ui[uiKey].classList.add('is-open');
+    this.#ui[uiKey].setAttribute('aria-expanded', 'true');
     this.#emit(`${uiKey}.show.after`, this.#ui[uiKey]);
 
   }
