@@ -774,6 +774,8 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('app').boot();
   Alpine.store('editor').boot();
 
+  bootManager();
+
   document.addEventListener('cy:gtm.tag.fired', (event) => {
 
     if (! event.detail.key)
@@ -795,7 +797,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const footer = document.querySelector('footer[data-testbench-footer]');
 
   main.style.minHeight = `calc(100vh - (${header.offsetHeight + (footer.offsetHeight)}px)`;
-
-  bootManager();
 
 });
