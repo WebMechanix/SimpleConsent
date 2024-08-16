@@ -30,6 +30,7 @@ class SimpleConsent {
     'denyAll',
     'saveSettings',
     'showSettings',
+    'toggleServices'
   ];
 
   #config = {};
@@ -144,12 +145,12 @@ class SimpleConsent {
       links: {
         privacyPolicy: {
           text: 'Privacy Policy',
-          url: '#/privacy-policy',
+          url: '#',
         },
         termsOfService: null,
         cookiePolicy: {
           text: 'Cookie Policy',
-          url: '#/cookie-policy',
+          url: '#',
         },
       },
       modal: {
@@ -370,6 +371,12 @@ class SimpleConsent {
                 {{ description }}
               </div>
               `,
+      service: `
+                <div> 
+                  <dt>{{ name }}</dt>
+                  <dd>{{ description }}</dd>
+                </div>
+               `,
       settingsButton: `
                       <button>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" width="24px" viewBox="0 -960 960 960" fill="currentColor" style="pointer-events: none">
@@ -379,13 +386,13 @@ class SimpleConsent {
                       `,
       type:   `
               <div class="consent-type">
-                <div class="consent-switch">
-                  <input type="checkbox" role="switch" id="type-{{ key }}" name="{{ key }}">
-                  <div class="consent-switch__text">
+                <input type="checkbox" role="switch" id="type-{{ key }}" name="{{ key }}">
+                <div class="consent-type__text">
+                  <div class="consent-type__header">
                     <label for="type-{{ key }}">{{ name }}</label>
-                    <div>{{ description }}</div>
-                    <div data-consent-type-services></div>
                   </div>
+                  <div class="consent-type__desc">{{ description }}</div>
+                  <dl data-consent-type-services></dl>
                 </div>
               </div>
               `,
@@ -740,6 +747,11 @@ class SimpleConsent {
         this.#close(e.target);
       }
 
+      if (e.target.hasAttribute('data-consent-toggle-services')) {
+        e.preventDefault();
+        this.#toggleServices(e.target);
+      }
+
     });
 
   }
@@ -882,6 +894,30 @@ class SimpleConsent {
       }
     }
     return target;
+  }
+
+  #eatCookies() {
+    const cookies = document.cookie.split(';');
+
+    cookies.forEach(cookie => {
+
+      const cookieName = cookie.split('=')[0].trim();
+
+      const matchesPattern = patterns.some(pattern => {
+        const regex = new RegExp(pattern);
+        return regex.test(cookieName);
+      });
+
+      if (matchesPattern) 
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      
+    });
+  }
+
+  #getCookieMatchPatterns() {
+    return Object.values(this.#config.services).reduce((acc, service) => {
+      return acc.concat(service.cookies.map(cookie => cookie.name));
+    }, []);
   }
 
   #getType(key) {
@@ -1157,10 +1193,6 @@ class SimpleConsent {
 
     for (let [typeKey, type] of Object.entries(this.#types)) {
 
-      // @review - this needs to be reworked to handle the new services object.
-      // if (! services[typeKey] && ! type.required) 
-      //   continue;
-
       this.#types[typeKey].key = typeKey;
 
       const tpl = this.#parseTemplate('type', type);
@@ -1182,6 +1214,29 @@ class SimpleConsent {
         input.disabled = true;
         input.checked = false;
         input.title = this.#config.content.notices.gpc.description;
+      }
+
+      if (services[typeKey]) {
+
+        const servicesToggle = document.createElement('button');
+        servicesToggle.textContent = `${services[typeKey].length} Service${services[typeKey].length > 1 ? 's' : ''}`;
+        servicesToggle.setAttribute('data-arrow', '↓');
+        servicesToggle.setAttribute('data-consent-toggle-services', typeKey);
+
+        // @bug - this needs to be reworked to be less fragile.
+        tpl.querySelector('.consent-type__header').appendChild(servicesToggle);
+
+        const servicesTarget = tpl.querySelector('[data-consent-type-services]');
+
+        this.#bulkSetAttributes(servicesTarget, {
+          'role': 'list',
+          'data-consent-tpl': 'services',
+        });
+
+        for (let service of services[typeKey]) {
+          let serviceTpl = this.#parseTemplate('service', service);
+          servicesTarget.appendChild(serviceTpl);
+        }
       }
 
       this.#ui.modal.querySelector('[data-consent-types]').appendChild(tpl);
@@ -1228,8 +1283,9 @@ class SimpleConsent {
       if (target.closest('[data-consent-tpl="modal"]') && this.#config.ui.showBranding) {
         let a = document.createElement('a');
         a.setAttribute('data-consent-branding', '');
-        a.href = 'https://github.com/derekcavaliero/simpleconsent/';
-        a.textContent = `Powered by ${this.#class}`;
+        a.href = 'https://github.com/WebMechanix/SimpleConsent/';
+        a.target = '_blank';
+        a.textContent = `${this.#class}`;
         target.appendChild(a);
       }
 
@@ -1362,6 +1418,17 @@ class SimpleConsent {
   #storePurge() {
     localStorage.removeItem(this.#config.storageName);
     document.cookie = `${this.#config.storageName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${this.#config.cookieDomain}`;
+  }
+
+  #toggleServices(target) {
+
+    const arrow = target.getAttribute('data-arrow');
+    target.setAttribute('data-arrow', arrow === '↓' ? '↑' : '↓');
+
+    const type = target.closest('[data-consent-tpl="type"]');
+    const services = type.querySelector(`[data-consent-type-services]`);
+    services.toggleAttribute('aria-expanded');
+
   }
   
   /* -------------
