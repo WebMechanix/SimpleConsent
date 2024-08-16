@@ -1565,16 +1565,16 @@ class SimpleConsent {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  const script = document.querySelector('script[data-config]');
+  const script = document.querySelector('script[data-consent-config]');
 
   if (! script) 
     return;
 
-  let config = window[script.dataset.config] || {};
+  let config = window[script.dataset.consentConfig] || {};
 
   new SimpleConsent(config);
 
   // Clean up the global namespace
-  delete window[script.dataset.config];
+  delete window[script.dataset.consentConfig];
   
 });
