@@ -474,6 +474,9 @@
   font-weight: 700;
 }
 
+button[data-consent-toggle-services] {
+  flex-shrink: 0;
+}
 
 [data-consent-tpl="services"]{
   flex-direction: column;
