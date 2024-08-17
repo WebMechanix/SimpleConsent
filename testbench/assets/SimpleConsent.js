@@ -427,7 +427,7 @@ class SimpleConsent {
       rootClass: 'simple-consent',
       rootId: 'simple-consent',
       showBranding: true,
-      showServiceLogos: true,
+      showServiceLogos: false,
     },
 
   };
@@ -615,7 +615,9 @@ class SimpleConsent {
             if (! route.geoMatch)
               return;
 
-            if (geo.match(route.geoMatch) && this.#_multiConfig.hasOwnProperty(route.config))
+            let expression = new RegExp(route.geoMatch);
+
+            if (expression.test(geo) && this.#_multiConfig.hasOwnProperty(route.config))
               this.#config = this.#deepMerge(this.#config, this.#_multiConfig[route.config]);
 
           });
