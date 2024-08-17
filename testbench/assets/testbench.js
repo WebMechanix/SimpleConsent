@@ -498,6 +498,7 @@ function logTag(tag) {
               cloudflare: {
                 name: 'Cloudflare',
                 description: 'Provides security and performance optimization for websites, protecting them from malicious traffic while improving load times by caching content and optimizing delivery.',
+                domain: 'cloudflare.com',
                 storage: {
                   security: {
                     __cf_bm: {
@@ -511,6 +512,7 @@ function logTag(tag) {
               google_analytics: {
                 name: 'Google Analytics',
                 description: 'Tracks and reports website traffic and user behavior, helping to analyze visitor data for improving site performance and user experience.',
+                domain: 'analytics.google.com',
                 storage: {
                   analytics_storage: {
                     _ga: {
@@ -528,6 +530,7 @@ function logTag(tag) {
               },
               google_ads: {
                 name: 'Google Ads',
+                domain: 'ads.google.com',
                 description: 'Online advertising platform that allows businesses to create ads that appear on Google\'s search engine and other properties, targeting users based on their search queries and interests.',
                 storage: {
                   advertising: {
@@ -546,6 +549,7 @@ function logTag(tag) {
               hubspot: {
                 name: 'HubSpot',
                 description: 'Marketing Automation & CRM platform that includes tools for marketing, sales, and customer service, offering features like email marketing, analytics, and lead tracking.',
+                domain: 'hubspot.com',
                 storage: {
                   analytics_storage: {
                     __hssc: {
@@ -575,6 +579,7 @@ function logTag(tag) {
               linkedin_ads: {
                 name: 'LinkedIn Ads',
                 description: 'Offers targeted advertising solutions on LinkedIn, allowing businesses to reach professionals based on their job title, industry, and other professional attributes.',
+                domain: 'linkedin.com',
                 storage: {
                   advertising: {
                     li_fat_id: {
@@ -586,8 +591,9 @@ function logTag(tag) {
                 types: ['advertising'],
               },
               marketo: {
-                name: 'Marketo (Adobe Marketing Cloud)',
+                name: 'Adobe Marketo Engage',
                 description: 'Marketing automation platform that helps with lead management, email marketing, and campaign reporting, enabling businesses to engage customers across multiple channels.',
+                domain: 'adobe.com',
                 storage: {
                   analytics_storage: {
                     _mkto_trk: {
@@ -599,8 +605,9 @@ function logTag(tag) {
                 types: ['analytics_storage'],
               },
               meta_ads: {
-                name: 'Meta Ads',
-                description: '(Formerly Facebook Ads) enables businesses to create targeted advertisements on Facebook, Instagram, and other Meta platforms, reaching users based on their demographics, interests, and behaviors.',
+                name: 'Facebook Ads',
+                description: '(AKA Meta Ads) enables businesses to create targeted advertisements on Facebook, Instagram, and other Meta platforms, reaching users based on their demographics, interests, and behaviors.',
+                domain: 'facebook.com',
                 storage: {
                   advertising: {
                     _fbp: {
@@ -618,6 +625,7 @@ function logTag(tag) {
               microsoft_ads: {
                 name: 'Microsoft Ads',
                 description: '(Formerly Bing Ads) allows businesses to display ads on the Bing search engine and its partner sites, targeting users based on their search behavior and demographics.',
+                domain: 'microsoft.com',
                 storage: {
                   advertising: {
                     _uetmsclkid: {
@@ -655,11 +663,6 @@ function logTag(tag) {
               // },
             },
             types: {
-              security_storage: {
-                name: 'Security Storage',
-                description: 'Enables storage and services related to security such as authentication functionality, fraud prevention, and other user protection.',
-                required: true,
-              },
               analytics_storage: {
                 name: 'Analytics & Performance',
                 description: 'Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).',
@@ -678,6 +681,11 @@ function logTag(tag) {
               functionality_storage: {
                 name: 'Functional Storage',
                 description: 'Enables storage and services that supports the functionality of the website or app (e.g. language settings).',
+              },
+              security_storage: {
+                name: 'Security Storage',
+                description: 'Enables storage and services related to security such as authentication functionality, fraud prevention, and other user protection.',
+                required: true,
               },
             },
           },
