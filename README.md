@@ -149,7 +149,7 @@ Each consent type is defined with its own "key" (e.g. `analytics_storage`, `adve
 Services are the individual scripts or tags that are loaded on your website that require consent. A service can belong to one or more consent types. Services are defined using the `services` property in the configuration object. This services object is used to generate a cookie policy, and each service will be listed under its respective consent type inside the consent settings modal.
 
 **Example:**
-``json
+```json
 "services": {
   "cloudflare": {
     "name": "Cloudflare",
