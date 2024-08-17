@@ -112,6 +112,7 @@ Consent types are the individual categories of data collection that your website
 - **`gpc`** (boolean) - If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected. This is useful for respecting the user's browser settings.\
 - **`mapTo`** (array) - If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
 
+**Example:**
 ```json
 "types": {
   "analytics_storage": {
@@ -143,6 +144,97 @@ Consent types are the individual categories of data collection that your website
 
 Each consent type is defined with its own "key" (e.g. `analytics_storage`, `advertising`, etc...). These keys are used to reference the consent types in the configuration object. These are also the keys that are used when pushing `dataLayer` events to Google Tag Manager, and also the stored consent object in cookies and/or localStorage.
 
+### Defining Services
+
+Services are the individual scripts or tags that are loaded on your website that require consent. A service can belong to one or more consent types. Services are defined using the `services` property in the configuration object. This services object is used to generate a cookie policy, and each service will be listed under its respective consent type inside the consent settings modal.
+
+**Example:**
+``json
+"services": {
+  "cloudflare": {
+    "name": "Cloudflare",
+    "description": "Provides security and performance optimization for websites, protecting them from malicious traffic while improving load times by caching content and optimizing delivery.",
+    "domain": "cloudflare.com",
+    "storage": {
+      "security": {
+        "__cf_bm": {
+          "purpose": "Contains information related to the calculation of Cloudflare's proprietary bot score and, when Anomaly Detection is enabled on Bot Management, a session identifier.",
+          "expires": "30 minutes"
+        }
+      }
+    },
+    "types": ["necessary", "security_storage"]
+  },
+  "google_analytics": {
+    "name": "Google Analytics",
+    "description": "Tracks and reports website traffic and user behavior, helping to analyze visitor data for improving site performance and user experience.",
+    "domain": "analytics.google.com",
+    "storage": {
+      "analytics_storage": {
+        "_ga": {
+          "purpose": "Browser (client) indentifer. Used to distinguish a unique browser (anonymous user).",
+          "expires": "2 years"
+        },
+        "_ga_XXXXXXXXXX": {
+          "pattern": "/_ga_[A-Z\\d]{6,}/",
+          "purpose": "Session indentifer. Used to distinguish current session, session count, and other related session information.",
+          "expires": "2 years"
+        }
+      }
+    },
+    "types": ["analytics_storage", "advertising"]
+  },
+  "google_ads": {
+    "name": "Google Ads",
+    "domain": "ads.google.com",
+    "description": "Online advertising platform that allows businesses to create ads that appear on Google's search engine and other properties, targeting users based on their search queries and interests.",
+    "storage": {
+      "advertising": {
+        "_gcl_au": {
+          "purpose": "",
+          "expires": "90 days"
+        },
+        "_gcl_aw": {
+          "purpose": "Stores click identifier and timestamp of the most recent Google Ads click.",
+          "expires": "90 days"
+        }
+      }
+    },
+    "types": ["advertising"]
+  },
+  "hubspot": {
+    "name": "HubSpot",
+    "description": "Marketing Automation & CRM platform that includes tools for marketing, sales, and customer service, offering features like email marketing, analytics, and lead tracking.",
+    "domain": "hubspot.com",
+    "storage": {
+      "analytics_storage": {
+        "__hssc": {
+          "purpose": "This cookie keeps track of sessions. This is used to determine if HubSpot should increment the session number and timestamps in the __hstc cookie. It contains the domain, viewCount (increments each pageView in a session), and session start timestamp.",
+          "expires": "30 minutes"
+        },
+        "__hssrc": {
+          "purpose": "Whenever HubSpot changes the session cookie, this cookie is also set to determine if the visitor has restarted their browser. If this cookie does not exist when HubSpot manages cookies, it is considered a new session. It contains the value \"1\" when present.",
+          "expires": "1 year"
+        },
+        "__hstc": {
+          "purpose": "The main cookie for tracking visitors. Contains the domain, hubspotutk, initial timestamp (first visit), last timestamp (last visit), current timestamp (this visit), and session number (increments for each subsequent session).",
+          "expires": "180 days"
+        },
+        "hubspotutk": {
+          "purpose": "Keeps track of a visitor's identity. It is passed to HubSpot on form submission and used when deduplicating contacts. It contains an opaque GUID to represent the current visitor.",
+          "expires": "180 days"
+        },
+        "messagesUtk": {
+          "purpose": "Used by to recognize visitors who use HubSpot chatbots and live chat features. ",
+          "expires": "180 days"
+        }
+      }
+    },
+    "types": ["analytics_storage", "personalization_storage"]
+  }
+}
+```
+
 ### Google Tag Manager Configuration
 
 #### `simple-consent:load` Event
@@ -152,21 +244,23 @@ When the consent banner is loaded, a `dataLayer` event is pushed to Google Tag M
 ```javascript
 dataLayer.push({
   event: 'simple-consent:load',
+  consent: {
+    // key:value pairs for each consent type set to "granted" or "denied".
+    // If a type is mapped to another type, the mapped type will be set to the same value as the original type (see "mapTo" in the advertising type definition above)
+    analytics_storage: 'denied',
+    advertising: 'denied',
+    ad_storage: 'denied',
+    ad_personalization: 'denied',
+    ad_user_data: 'denied',
+    personalization_storage: 'denied',
+    functionality_storage: 'denied',
+    security_storage: 'granted',
+  },
   consentMeta: {
     consentModel: 'opt-in', // opt-in or opt-out - pulled from the loaded config.
     geo: null,              // a value from your own geolocation lookup if using a multi-config setup null otherwise
     gpc: false,             // true if the user has Global Privacy Control enabled false otherwise
-  },
-  // key:value pairs for each consent type set to "granted" or "denied".
-  // If a type is mapped to another type, the mapped type will be set to the same value as the original type (see "mapTo" in the advertising type definition above)
-  analytics_storage: 'denied',
-  advertising: 'denied',
-  ad_storage: 'denied',
-  ad_personalization: 'denied',
-  ad_user_data: 'denied',
-  personalization_storage: 'denied',
-  functionality_storage: 'denied',
-  security_storage: 'granted',
+  }
 })
 ```
 
@@ -177,17 +271,19 @@ Directly before the `simple-consent:load` event payload is pushed, a `gtag('cons
 ```javascript
 dataLayer.push({
   event: 'simple-consent:update',
+  consent: {
+    analytics_storage: 'granted',
+    advertising: 'granted',
+    ad_storage: 'granted',
+    ad_personalization: 'granted',
+    ad_user_data: 'granted',
+    personalization_storage: 'granted',
+    functionality_storage: 'granted',
+    security_storage: 'granted',
+  },
   consentMeta: { 
     //... 
-  },
-  analytics_storage: 'granted',
-  advertising: 'granted',
-  ad_storage: 'granted',
-  ad_personalization: 'granted',
-  ad_user_data: 'granted',
-  personalization_storage: 'granted',
-  functionality_storage: 'granted',
-  security_storage: 'granted',
+  }
 })
 ```
 
@@ -202,6 +298,8 @@ The in most cases - you'll likely have a "Consent / grated - [type]" trigger for
 - Be aware that the "Require additional consent for tag to fire" has a known bug with "fire one per page" tags. For this reason, its best to avoid using the additional consent checks feature at this point in time.
 
 ##### Sample GTM Container Configuration
+
+See: [testbench/assets/GTM-testbench-default.json](testbench/assets/GTM-testbench-default.json)
 
 #### Contributing
 
