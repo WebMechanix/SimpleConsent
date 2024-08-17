@@ -476,6 +476,7 @@ button[data-consent-toggle-services] {
   display: inline-block;
   height: 1.25rem;
   width: 1.25rem;
+  border-radius: 0.125rem;
   background-image: var(--consent-service-logo-url);
   background-size: contain;
   background-repeat: no-repeat;
