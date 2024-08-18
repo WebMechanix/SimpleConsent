@@ -112,13 +112,13 @@ You can view the source of the default `#config` object in the SimpleConsent cla
 
 #### Defining Types
 
-Consent types are the individual categories of data collection that your website performs. These can be anything from "Analytics" to "Marketing" or "Functional" data collection. Each consent type can have the following properties:
+Consent types are the individual categories of data collection/storage that your website (and its services) perform/use. These types are what users will allow/deny when interacting with the consent preferences UI. Types are defined using the `types` configration property. Each consent type can have the following properties:
 
 | Property | Type | Description |
 | :------------ | :-------- | :--- |
 | `name`        | `string`  | The title of the consent type (what is show to the end user). |
 | `description` | `string`  | Brief (1-2 sentences) explanation of what services/storage is used for the consent type. |
-| `required`    | `boolean` | Changes the consent toggle to `disabled` and `granted` if set to `true`.. 
+| `required`    | `boolean` | Changes the consent toggle to `disabled` and `granted` if set to `true`. | 
 | `gpc`         | `boolean` | If `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected. |
 | `mapTo`       | `array`   | Used to map a particular consent type to other types (useful for Google's Consent Mode). This is an array of strings that represent consent type keys. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...). |
 
