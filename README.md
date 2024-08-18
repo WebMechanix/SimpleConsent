@@ -59,6 +59,10 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 5. Require support for dead browsers like Internet Explorer
 6. Need "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
+### Contributing
+
+If you would like to contribute to this project, please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
+
 ---
 
 ### Installation
@@ -308,7 +312,3 @@ The in most cases - you'll likely have a "Consent / grated - [type]" trigger for
 > [!IMPORTANT]
 > - You should avoid using "All Pages", "Initialization", or "Consent Initialization" trigger types for any of your tags that require consent. Failing to do so will result in the tags firing before the consent signals are set. Instead, use the custom events documented above as a trigger(s) for your tags that should fire on page load or related events.
 > - GTM's "Require additional consent for tag to fire" tag setting has a known bug with the "fire one per page" setting. For this reason, its best to avoid using the additional consent checks feature on tags that use this setting.
-
-#### Contributing
-
-If you would like to contribute to this project, please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
