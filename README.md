@@ -114,7 +114,7 @@ Consent types are the individual categories of data collection that your website
 
 **Example:**
 ```json
-"types": {
+{
   "analytics_storage": {
     "name": "Analytics & Performance",
     "description": "Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).",
@@ -150,7 +150,7 @@ Services are the individual scripts or tags that are loaded on your website that
 
 **Example:**
 ```json
-"services": {
+{
   "cloudflare": {
     "name": "Cloudflare",
     "description": "Provides security and performance optimization for websites, protecting them from malicious traffic while improving load times by caching content and optimizing delivery.",
