@@ -96,7 +96,7 @@ Inside the `consentConfig.js` (or whatever you chose for a filename) file, you w
  * As such, this object will not be available to other scripts on your page.
  */
 window.consentConfig = window.consentConfig || {
-  "consentModel: "opt-out",
+  "consentModel": "opt-out",
   "content": {
     "banner": {
       "heading": "🍪 Notice",
