@@ -1,8 +1,8 @@
-# SimpleConsent
+# SimpleConsent.js
 
 <img src="docs/images/ui-display.png" width=830 style="margin: 0 auto; display: block;" />
 
-### ⚠️ Legal Disclaimer! ⚠️
+### ⚠️ Legal Disclaimer!
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
 
@@ -12,10 +12,12 @@ As such, installing this tool on your website does not "magically" make you comp
 
 ---
 
-#### **⚠️ This project is in active development ⚠️** 
+#### **⚠️ This project is in active development** 
 A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
-#### Foreword
+---
+
+### Foreword
 
 This project is/was inspired by [Klaro](https://github.com/klaro-org/klaro-js). Klaro is another great open-source consent project, and does a LOT more than this library - especially around "autoblocking" behavior. However, Klaro takes a "services first" approach to its configuration instead of "consent types". This makes Klaro a bit harder to use with GTM and more specifically its consent signal APIs that are "type/behavior" focused. So TL;DR - if this library doesn't fit your needs, check out Klaro - it very well could.
 
@@ -33,20 +35,20 @@ Compare this to bloated CMPs like OneTrust or CookieBot which can be 100KB+ in s
 If you... 
 - Can write basic JSON structures, you can configure it 
 - Can write some basic CSS, you can style it
-- Use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates
-- Have access to Cloudflare Workers, or Server-Side GTM, (or similar tech) you can create geolocation routing
+- Use a front-end component library, you can customize the underlying UI templates
+- Have access to Cloudflare Workers, or Server-Side GTM, (or similar tech) you can create multi-config routing based on the users geolocation
 
 #### 🏷️ Google Tag Manager (GTM) Focused
 Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
-### SimpleConsent might be for you if...
+### This might be for you if...
 
 1. ✅ You use Google Tag Manager (GTM) as your TMS
 2. ✅ You aren't afraid to write some basic JS/JSON and CSS to configure and customize it.
 3. ✅ You want a 1st party solution that doesn't rely on 3rd party services. 
 4. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot hurting your site's performance.
 
-### SimpleConsent isn't for you if...
+### This isn't for you if...
 
 1. ❌ You don't use Google Tag Manager (GTM) as your TMS
 2. ❌ You require "autoblocking" behavior
@@ -61,10 +63,10 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 
 #### Installation
 
-In order to use SimpleConsent, 2 things are required. If you have used Klaro before, the process is identical.
+In order to use SimpleConsent, 3 things are required. If you have used Klaro before, this process is identical.
 
 1. **Stylesheet** (SimpleConsent.min.css) (if using the default theme)
-2. **A configuration file/object** (consentConfig.js) that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but for the sake of maintainability, it is recommended to keep it separate.
+2. **A configuration file/object** (e.g. consentConfig.js) that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but for the sake of maintainability, it is recommended to keep it separate.
 3. **Main Library** (SimpleConsent.min.js) with a `data-consent-config` attribute that points to the global configuration object that will be loaded. 
 
 You can do this by adding the following code to your website's `<head>`.
@@ -76,6 +78,8 @@ You can do this by adding the following code to your website's `<head>`.
   data-consent-config="consentConfig"
   src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.js"></script>
 ```
+
+**Note** - if you're loading the library as shown above via JSDelivr, we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
 
 #### Configuration
 
