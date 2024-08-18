@@ -7,6 +7,26 @@
 > [!WARNING] 
 > **This project is in active development.** \
 > A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
+> #### v1.0 Roadmap
+> - [ ] Tag 1.0 release 🚀
+> - [ ] Ensure A11y for Banner and Modal UI (in progress)
+> - [ ] Embedable Cookie Policy
+> - [ ] Provide sample Geolocation API Cloudflare Worker
+> - [ ] Setup E2E Testing via Cypress (in progress)
+> - [x] Global Privacy Control Support
+> - [x] Google Consent Mode (v1 & 2) Support (in QA)
+> - [ ] Deploy Testbench (in QA)
+> - [ ] Test Default CSS (in progress)
+> - [x] Localization Support
+> - [x] Document Installation
+> - [x] Document Basic Configuration
+> - [x] Document Service/Type Configration
+> - [ ] Document Localization Setup
+> - [ ] Document Multi-Configuration Setup
+> - [ ] Document GTM Configuration/Setup (in QA)
+> - [x] Provide Sample GTM Container Export
+> - [ ] Document Callbacks & Custom Events
+> - [ ] Document CSS Customization
 
 ---
 
