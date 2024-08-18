@@ -105,11 +105,15 @@ You can view the source of the default `#config` object in the SimpleConsent cla
 
 Consent types are the individual categories of data collection that your website performs. These can be anything from "Analytics" to "Marketing" or "Functional" data collection. Each consent type can have the following properties:
 
-- **`name`** `(string)` - The title of the consent type (what is show to the end user)
-- **`description`** `(string)` - A description of the consent type usually a brief explanation of what services/storage is used for the consent type.
-- **`required`** `(boolean)` - Whether or not the consent type is required for the website to function properly. Note, the library will automatically add a "necessary" type - you do not need to define one explicitly.
-- **`gpc`** `(boolean)` - If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected.
-- **`mapTo`** `(array)` - If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
+**`name`** `(string)` - The title of the consent type (what is show to the end user)
+
+**`description`** `(string)` - A description of the consent type usually a brief explanation of what services/storage is used for the consent type.
+
+**`required`** `(boolean)` - Whether or not the consent type is required for the website to function properly. Note, the library will automatically add a "necessary" type - you do not need to define one explicitly.
+
+**`gpc`** `(boolean)` - If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected.
+
+**`mapTo`** `(array)` - If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
 
 **Example:**
 ```json
