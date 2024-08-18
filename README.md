@@ -59,9 +59,7 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 
 ---
 
-### Getting Started
-
-#### Installation
+### Installation
 
 In order to use SimpleConsent, 3 things are required. If you have used Klaro before, this process is identical.
 
@@ -81,7 +79,7 @@ You can do this by adding the following code to your website's `<head>`.
 
 **Note** - if you're loading the library as shown above via JSDelivr, we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
 
-#### Configuration
+### Configuration
 
 Inside the `consentConfig.js` (or whatever you chose for a filename) file, you will need to define a global object called `consentConfig` (or whatever you chose for global object) that will be used to configure the consent manager behavior. This configuration object is merged with the default configuration object provided by the library allowing you to override any default settings. 
 
@@ -105,7 +103,7 @@ The above example will display a banner with the title "🍪 Notice" and use an 
 
 You can view the source of the default `#config` object in the SimpleConsent class. Each configration object is annotated with JSDoc comments to help you understand what each property does.
 
-### Defining Consent Types
+#### Defining Consent Types
 
 Consent types are the individual categories of data collection that your website performs. These can be anything from "Analytics" to "Marketing" or "Functional" data collection. Each consent type can have the following properties:
 
@@ -156,7 +154,7 @@ If you wish to map a particular consent type to other consent types (useful for 
 
 Each consent type is defined with its own "key" (e.g. `analytics_storage`, `advertising`, etc...). These keys are used to reference the consent types in the configuration object. These are also the keys that are used when pushing `dataLayer` events to Google Tag Manager, and also the stored consent object in cookies and/or localStorage.
 
-### Defining Services
+#### Defining Services
 
 Services are the individual scripts or tags that are loaded on your website that require consent. A service can belong to one or more consent types. Services are defined using the `services` property in the configuration object. This services object is used to generate a cookie policy, and each service will be listed under its respective consent type inside the consent settings modal.
 
@@ -247,7 +245,7 @@ Services are the individual scripts or tags that are loaded on your website that
 }
 ```
 
-### Google Tag Manager Configuration
+### Google Tag Manager Integration
 
 #### `simple-consent:load` Event
 
