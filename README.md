@@ -70,22 +70,23 @@ If you would like to contribute to this project, please see the [CONTRIBUTING.md
 
 In order to use SimpleConsent, 3 things are required. If you have used Klaro before, this process is identical.
 
-1. **Stylesheet** (SimpleConsent.min.css) (if using the default theme)
-2. **A configuration file/object** (e.g. consentConfig.js) that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but for the sake of maintainability, it is recommended to keep it separate.
-3. **Main Library** (SimpleConsent.min.js) with a `data-consent-config` attribute that points to the global configuration object that will be loaded. 
+1. **A configuration file/object** that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but, for the sake of maintainability, it is recommended to keep it separate.
+2. **Library CSS** `SimpleConsent.min.css`
+3. **Library JS** `SimpleConsent.min.js` with a `data-consent-config` attribute that points to the global configuration object that will be loaded. 
 
+#### Via CDN (jsDelivr)
 You can do this by adding the following code to your website's `<head>`.
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.css" rel="stylesheet">
 <script defer src="/path/to/consentConfig.js"></script>
 <script defer
   data-consent-config="consentConfig"
-  src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.js"></script>
+  src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.js"></script>
 ```
 
 > [!IMPORTANT]
-> If you're loading the library via JSDelivr (as shown above), we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
+> If you're loading the library via jsDelivr (as shown above), **we don't suggest using `@latest` in a production environment** as it may introduce breaking changes for major version changes in the future. Pick a release version instead.
 
 ### Configuration
 
