@@ -1,8 +1,8 @@
-# SimpleConsent
+# SimpleConsent.js
 
 <img src="docs/images/ui-display.png" width=830 style="margin: 0 auto; display: block;" />
 
-### ⚠️ Legal Disclaimer! ⚠️
+### ⚠️ Legal Disclaimer!
 
 **The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
 
@@ -12,10 +12,12 @@ As such, installing this tool on your website does not "magically" make you comp
 
 ---
 
-#### **⚠️ This project is in active development ⚠️** 
+#### **⚠️ This project is in active development** 
 A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
-#### Foreword
+---
+
+### Foreword
 
 This project is/was inspired by [Klaro](https://github.com/klaro-org/klaro-js). Klaro is another great open-source consent project, and does a LOT more than this library - especially around "autoblocking" behavior. However, Klaro takes a "services first" approach to its configuration instead of "consent types". This makes Klaro a bit harder to use with GTM and more specifically its consent signal APIs that are "type/behavior" focused. So TL;DR - if this library doesn't fit your needs, check out Klaro - it very well could.
 
@@ -33,28 +35,27 @@ Compare this to bloated CMPs like OneTrust or CookieBot which can be 100KB+ in s
 If you... 
 - Can write basic JSON structures, you can configure it 
 - Can write some basic CSS, you can style it
-- Use a front-end component library (e.g. Bootstrap or similar), you can edit the underlying UI templates
-- Have access to Cloudflare Workers, or Server-Side GTM, (or similar tech) you can create geolocation routing
+- Use a front-end component library, you can customize the underlying UI templates
+- Have access to Cloudflare Workers, or Server-Side GTM, (or similar tech) you can create multi-config routing based on the users geolocation
 
 #### 🏷️ Google Tag Manager (GTM) Focused
 Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
-### SimpleConsent might be for you if...
+### This might be for you if...
 
 1. ✅ You use Google Tag Manager (GTM) as your TMS
 2. ✅ You aren't afraid to write some basic JS/JSON and CSS to configure and customize it.
 3. ✅ You want a 1st party solution that doesn't rely on 3rd party services. 
 4. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot hurting your site's performance.
 
-### SimpleConsent isn't for you if...
+### This isn't for you if...
 
 1. ❌ You don't use Google Tag Manager (GTM) as your TMS
 2. ❌ You require "autoblocking" behavior
-3. ❌ You want a "low code" solution.
-4. ❌ You require IAB TCF v2.X compaitibility (might be added in the future - no promises)
-5. ❌ You require AMP compatibility (no plans to support this)
-6. ❌ You require support for dead browsers like Internet Explorer (no plans to support this)
-7. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
+3. ❌ You require IAB TCF v2.X compaitibility
+4. ❌ You require AMP compatibility
+5. ❌ You require support for dead browsers like Internet Explorer
+6. ❌ You need "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
 ---
 
@@ -62,21 +63,23 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 
 #### Installation
 
-In order to use SimpleConsent, 2 things are required. If you have used Klaro before, the process is identical.
+In order to use SimpleConsent, 3 things are required. If you have used Klaro before, this process is identical.
 
 1. **Stylesheet** (SimpleConsent.min.css) (if using the default theme)
-2. **A configuration file/object** (consentConfig.js) that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but for the sake of maintainability, it is recommended to keep it separate.
+2. **A configuration file/object** (e.g. consentConfig.js) that is loaded by your site. You may also have your configuration bundled into other JS files if you prefer - but for the sake of maintainability, it is recommended to keep it separate.
 3. **Main Library** (SimpleConsent.min.js) with a `data-consent-config` attribute that points to the global configuration object that will be loaded. 
 
 You can do this by adding the following code to your website's `<head>`.
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/derekcavaliero/simpleconsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
 <script defer src="/path/to/consentConfig.js"></script>
 <script defer
   data-consent-config="consentConfig"
-  src="https://cdn.jsdelivr.net/gh/derekcavaliero/simpleconsent@latest/dist/SimpleConsent.min.js"></script>
+  src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.js"></script>
 ```
+
+**Note** - if you're loading the library as shown above via JSDelivr, we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
 
 #### Configuration
 
@@ -106,15 +109,24 @@ You can view the source of the default `#config` object in the SimpleConsent cla
 
 Consent types are the individual categories of data collection that your website performs. These can be anything from "Analytics" to "Marketing" or "Functional" data collection. Each consent type can have the following properties:
 
-- **`name`** (string) - The title of the consent type (what is show to the end user)
-- **`description`** (string) - A description of the consent type usually a brief explanation of what services/storage is used for the consent type.
-- **`required`** (boolean) - Whether or not the consent type is required for the website to function properly. Note, the library will automatically add a "necessary" type - you do not need to define one explicitly.
-- **`gpc`** (boolean) - If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected. This is useful for respecting the user's browser settings.\
-- **`mapTo`** (array) - If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
+##### **`name`** `(string)`
+The title of the consent type (what is show to the end user)
+
+##### **`description`** `(string)`
+A description of the consent type usually a brief explanation of what services/storage is used for the consent type.
+
+##### **`required`** `(boolean)`
+Whether or not the consent type is required for the website to function properly. Note, the library will automatically add a "necessary" type - you do not need to define one explicitly.
+
+##### **`gpc`** `(boolean)`
+If set to `true`, the consent type will be automatically disabled if a `navigator.globalPrivacyControl` is detected.
+
+##### **`mapTo`** `(array)`
+If you wish to map a particular consent type to other consent types (useful for Google's Consent Mode). This is an array of strings that represent the names of other consent types. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...).
 
 **Example:**
 ```json
-"types": {
+{
   "analytics_storage": {
     "name": "Analytics & Performance",
     "description": "Enables storage and services that are used to measure visits, sessions, and certain types of on-page activity (such as clicks on buttons).",
@@ -150,7 +162,7 @@ Services are the individual scripts or tags that are loaded on your website that
 
 **Example:**
 ```json
-"services": {
+{
   "cloudflare": {
     "name": "Cloudflare",
     "description": "Provides security and performance optimization for websites, protecting them from malicious traffic while improving load times by caching content and optimizing delivery.",
