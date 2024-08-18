@@ -2,18 +2,20 @@
 
 <img src="docs/images/ui-display.png" width=830 style="margin: 0 auto; display: block;" />
 
-### ⚠️ Legal Disclaimer!
+---
 
-**The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations are not a substitute for proper legal counsel**.
-
-As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
-
-**It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
+> [!WARNING] 
+> **This project is in active development.**
+> 
+> A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 ---
 
-#### **⚠️ This project is in active development** 
-A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
+> [!CAUTION]
+> **Legal Disclaimer! The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations may not meet your specific legal requirements and are NOT a substitute for proper legal counsel.**
+> 
+> As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
+> **It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
 
 ---
 
@@ -77,7 +79,8 @@ You can do this by adding the following code to your website's `<head>`.
   src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.js"></script>
 ```
 
-**Note** - if you're loading the library as shown above via JSDelivr, we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
+> [!NOTE]
+> If you're loading the library via JSDelivr (as shown above), we don't suggest using `@latest` in a production environment as it may introduce breaking changes for major version changes in the future.
 
 ### Configuration
 
@@ -247,6 +250,9 @@ Services are the individual scripts or tags that are loaded on your website that
 
 ### Google Tag Manager Integration
 
+> [!TIP]
+> Check out the provided [Testbench GTM container export](testbench/assets/GTM-testbench-default.json) to get familar with the trigger/variable configuration.
+
 #### `simple-consent:load` Event
 
 When the consent banner is loaded, a `dataLayer` event is pushed to Google Tag Manager with the following structure:
@@ -303,13 +309,9 @@ Similar to `simple-consent:load`, directly before the `simple-consent:update` ev
 
 The in most cases - you'll likely have a "Consent / grated - [type]" trigger for each consent type that you want to fire tags on. It's suggested to use a custom event trigger that matches both the load and update events via regex `simple-consent:(load|update)` to handle both opt-in and opt-out consent models.
 
-##### IMPORTANT NOTES
-- You should not use any "All Pages", "Initialization", or "Consent Initialization" trigger types for any of your tags that require consent. Doing so will result in the tags firing before the consent signals are set. Instead, use the `simple-consent:load` custom event as a trigger for your tags that should fire on page load or related events.
-- Be aware that the "Require additional consent for tag to fire" has a known bug with "fire one per page" tags. For this reason, its best to avoid using the additional consent checks feature at this point in time.
-
-##### Sample GTM Container Configuration
-
-See: [testbench/assets/GTM-testbench-default.json](testbench/assets/GTM-testbench-default.json)
+> [!IMPORTANT]
+> - You should avoid using "All Pages", "Initialization", or "Consent Initialization" trigger types for any of your tags that require consent. Failing to do so will result in the tags firing before the consent signals are set. Instead, use the custom events documented above as a trigger(s) for your tags that should fire on page load or related events.
+> - GTM's "Require additional consent for tag to fire" tag setting has a known bug with the "fire one per page" setting. For this reason, its best to avoid using the additional consent checks feature on tags that use this setting.
 
 #### Contributing
 
