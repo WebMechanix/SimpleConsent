@@ -11,8 +11,8 @@
 
   --consent-background-color: #fff;
   --consent-banner-heading-font-size: 1.25rem;
-  --consent-banner-max-width: 29.5rem; /* ~460px */
-  --consent-banner-offset: 0.75rem;
+  --consent-banner-max-width: 29rem; /* ~460px */
+  --consent-banner-offset: 1rem;
 
   --consent-border: 1px solid rgba(0, 0, 0, 0.175);
   --consent-border-radius: 0.325rem;
@@ -229,6 +229,7 @@
   font-weight: var(--consent-button-font-weight);
   cursor: pointer;
   outline-offset: 1px;
+  flex-grow: 1;
 }
 [data-consent-tpl] [data-consent-action]:focus-visible:not([class]) {
   outline: 2px solid var(--consent-color-primary);
@@ -251,6 +252,7 @@
   color: var(--consent-color-primary);
   padding-left: 0;
   padding-right: 0;
+  flex-grow: 0;
 }
 [data-consent-tpl] [data-consent-action="showSettings"]:hover:not([class]),
 [data-consent-tpl] [data-consent-action="showSettings"]:focus:not([class]) {
@@ -330,7 +332,7 @@
 }
 .consent-modal .consent-ui__content{
   width: var(--consent-modal-width);
-  margin: var(--consent-padding-base) 0;
+  margin-top: var(--consent-padding-base);
   max-width: calc(100vw - var(--consent-padding-base));
 }
 .consent-modal__header{
@@ -502,6 +504,9 @@ button[data-consent-toggle-services] {
   [data-consent-branding] {
     margin-left: auto;
     width: auto;
+  }
+  [data-consent-tpl] [data-consent-action]:not([class]) {
+    flex-grow: 0;
   }
   .consent-banner__description{
     padding-right: 2.5rem;
