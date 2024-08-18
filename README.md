@@ -94,6 +94,9 @@ You can do this by adding the following code to your website's `<head>`.
 
 Inside the `consentConfig.js` (or whatever you chose for a filename) file, you will need to define a global object called `consentConfig` (or whatever you chose for global object) that will be used to configure the consent manager behavior. This configuration object is merged with the default configuration object provided by the library allowing you to override any default settings. 
 
+> [!TIP]
+> You can view the source of the `#default` property in the SimpleConsent class. Each configuration property is annotated with JSDoc comments to help you understand its purpose and structure.
+
 ```javascript
 window.consentConfig = window.consentConfig || {
   "consentModel": "opt-out",
@@ -106,12 +109,10 @@ window.consentConfig = window.consentConfig || {
 };
 ```
 
-> [!NOTE]
-> SimpleConsent will clean up the global scope after initialization. As such, your configuration object will not be available to other scripts on your page in the global scope.
-
 The above example will display a banner with the title "🍪 Notice" and use an "opt-out" consent model (meaning the default consent types are all enabled until the user disables them).
 
-You can view the source of the default `#config` object in the SimpleConsent class. Each configration object is annotated with JSDoc comments to help you understand what each property does.
+> [!NOTE]
+> SimpleConsent will clean up the global scope after initialization. As such, your configuration object will not be available to other scripts on your page in the global scope.
 
 #### Defining Types
 
