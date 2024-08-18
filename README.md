@@ -80,7 +80,11 @@ You can do this by adding the following code to your website's `<head>`.
 ```html
 <link href="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.css" rel="stylesheet">
 <script defer src="/path/to/consentConfig.js"></script>
-<script defer src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.js" data-consent-config="consentConfig"></script>
+<script
+  defer
+  data-consent-config="consentConfig"
+  src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.js"
+></script>
 ```
 
 > [!CAUTION]
