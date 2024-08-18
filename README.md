@@ -14,7 +14,8 @@
 > [!CAUTION]
 > **Legal Disclaimer! The maintainers of this library are not data-privacy lawyers, and this library's defaults and/or example configurations may not meet your specific legal requirements and are NOT a substitute for proper legal counsel.**
 > 
-> As such, installing this tool on your website does not "magically" make you compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly.
+> Installing this library on your website WILL NOT "magically" make it compliant with regional data collection laws - it must be configured properly with Google Tag Manager to work correctly. This is true for any consent management tools, they cannot guarantee compliance (also - if they say otherwise - they're lying to you).
+> 
 > **It cannot be understated to always consult with a data privacy professional to ensure your consent banner configuration is compliant with regional data collection laws.**
 
 ---
