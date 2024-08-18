@@ -85,7 +85,7 @@ You can do this by adding the following code to your website's `<head>`.
   src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@release/dist/SimpleConsent.min.js"></script>
 ```
 
-> [!IMPORTANT]
+> [!CAUTION]
 > If you're loading the library via jsDelivr (as shown above), **we don't suggest using `@latest` in a production environment** as it may introduce breaking changes for major version changes in the future. Pick a release version instead.
 
 ### Configuration
