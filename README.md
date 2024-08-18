@@ -50,11 +50,10 @@ Designed to work with GTM's consent signal APIs and provide better ergonomics fo
 
 1. ❌ You don't use Google Tag Manager (GTM) as your TMS
 2. ❌ You require "autoblocking" behavior
-3. ❌ You want a "low code" solution.
-4. ❌ You require IAB TCF v2.X compaitibility (might be added in the future - no promises)
-5. ❌ You require AMP compatibility (no plans to support this)
-6. ❌ You require support for dead browsers like Internet Explorer (no plans to support this)
-7. ❌ You need bundled "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
+3. ❌ You require IAB TCF v2.X compaitibility
+4. ❌ You require AMP compatibility
+5. ❌ You require support for dead browsers like Internet Explorer
+6. ❌ You need "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
 ---
 
@@ -71,11 +70,11 @@ In order to use SimpleConsent, 2 things are required. If you have used Klaro bef
 You can do this by adding the following code to your website's `<head>`.
 
 ```html
-<link href="https://cdn.jsdelivr.net/gh/webmechanix/simpleconsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.css" rel="stylesheet">
 <script defer src="/path/to/consentConfig.js"></script>
 <script defer
   data-consent-config="consentConfig"
-  src="https://cdn.jsdelivr.net/gh/webmechanix/simpleconsent@latest/dist/SimpleConsent.min.js"></script>
+  src="https://cdn.jsdelivr.net/gh/WebMechanix/SimpleConsent@latest/dist/SimpleConsent.min.js"></script>
 ```
 
 #### Configuration
