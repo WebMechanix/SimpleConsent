@@ -50,7 +50,7 @@
 }
 
 [data-consent-placement*="bottom"]{
-  bottom: 5rem !important;
+  bottom: 5.25rem !important;
 }
 
 /* Alpine.js */
@@ -67,8 +67,13 @@ body {
   margin: 0 auto;
 }
 
-.brand svg{
+.brand-icon{
   height: 2.75rem;
+}
+
+.brand-icon{
+  mask-image: url(ios-icon-mask.svg);
+  mask-size: cover;
 }
 
 /* Text */
