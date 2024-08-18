@@ -280,7 +280,7 @@ dataLayer.push({
 })
 ```
 
-Directly before the `simple-consent:load` event payload is pushed, a `gtag('consent', 'default', {})` command is pushed with the same payload (minus the `event`, and `consentMeta` properties). This ensures that the consent signal is properly set in Google Tag Manager before any tags configured to use the consent signal are fired.
+Directly before the `simple-consent:load` event payload is pushed, a `gtag('consent', 'default', {})` command is pushed with the same `consent` object payload. This ensures that the consent signal is properly set in Google Tag Manager before any tags configured to use the consent signal are fired.
 
 #### `simple-consent:update` Event
 
@@ -303,7 +303,7 @@ dataLayer.push({
 })
 ```
 
-Similar to `simple-consent:load`, directly before the `simple-consent:update` event payload is pushed, a `gtag('consent', 'update', { ... })` command is pushed with the same payload (minus the `event`, and `consentMeta` properties).
+Similar to `simple-consent:load`, directly before the `simple-consent:update` event payload is pushed, a `gtag('consent', 'update', { ... })` command is pushed with the same `consent` object payload.
 
 #### Trigger/Variable Setup
 
