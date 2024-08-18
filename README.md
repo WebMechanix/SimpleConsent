@@ -127,7 +127,7 @@ Consent types are the individual categories of data collection/storage that your
 | `mapTo`       | `array`   | Used to map a particular consent type to other types (useful for Google's Consent Mode). This is an array of strings that represent consent type keys. (e.g. `ad_user_data`, `ad_storage`, `ad_personalization` etc...). |
 
 > [!NOTE]
-> The library automatically adds a "necessary" type consent type. You do not need to define one.
+> The library automatically adds a "necessary" consent type. You do not need to define one.
 
 **Example:**
 ```json
