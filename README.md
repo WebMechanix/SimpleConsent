@@ -41,21 +41,21 @@ If you...
 #### 🏷️ Google Tag Manager (GTM) Focused
 Designed to work with GTM's consent signal APIs and provide better ergonomics for GTM users.
 
-### This might be for you if...
+#### ✅ This library might be a fit if you...
 
-1. ✅ You use Google Tag Manager (GTM) as your TMS
-2. ✅ You aren't afraid to write some basic JS/JSON and CSS to configure and customize it.
-3. ✅ You want a 1st party solution that doesn't rely on 3rd party services. 
-4. ✅ You're fed up with bloated CMPs like OneTrust or CookieBot hurting your site's performance.
+1. Use Google Tag Manager (GTM) as your TMS
+2. Aren't afraid to write some basic JS/JSON and CSS to configure and customize it.
+3. Want a 1st party solution that doesn't rely on 3rd party services. 
+4. Are fed up with bloated CMPs like OneTrust or CookieBot hurting your site's performance.
 
-### This isn't for you if...
+#### ❌ This library isn't a fit if you...
 
-1. ❌ You don't use Google Tag Manager (GTM) as your TMS
-2. ❌ You require "autoblocking" behavior
-3. ❌ You require IAB TCF v2.X compaitibility
-4. ❌ You require AMP compatibility
-5. ❌ You require support for dead browsers like Internet Explorer
-6. ❌ You need "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
+1. Don't use Google Tag Manager (GTM) as your TMS
+2. Require "autoblocking" behavior
+3. Require IAB TCF v2.X compaitibility
+4. Require AMP compatibility
+5. Require support for dead browsers like Internet Explorer
+6. Need "baked in" (cookie pun intended) geolocation routing or a built-in cookie scanner.
 
 ---
 
