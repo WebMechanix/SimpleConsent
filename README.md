@@ -5,8 +5,7 @@
 ---
 
 > [!WARNING] 
-> **This project is in active development.**
-> 
+> **This project is in active development.** \
 > A proper release will be tagged when ready. There are likely bugs and missing features at this point in time.
 
 ---
@@ -95,7 +94,7 @@ You can do this by adding the following code to your website's `<head>`.
 Inside the `consentConfig.js` (or whatever you chose for a filename) file, you will need to define a global object called `consentConfig` (or whatever you chose for global object) that will be used to configure the consent manager behavior. This configuration object is merged with the default configuration object provided by the library allowing you to override any default settings. 
 
 > [!TIP]
-> You can view the source of the [`#default` property](https://github.com/WebMechanix/SimpleConsent/blob/41fed26b235ef0d932d753b49328b6334f87f89b/src/SimpleConsent.js#L53) in the SimpleConsent class. Each configuration property is annotated with JSDoc comments to help you understand its purpose and structure.
+> You can view the source of the [`#default`](https://github.com/WebMechanix/SimpleConsent/blob/41fed26b235ef0d932d753b49328b6334f87f89b/src/SimpleConsent.js#L53) property in the SimpleConsent class. Each configuration property is annotated with JSDoc comments to help you understand its purpose and structure.
 
 ```javascript
 window.consentConfig = window.consentConfig || {
